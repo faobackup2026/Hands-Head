@@ -1,0 +1,21 @@
+# HANDS & HEAD by Fao Labs
+# Dependências Python
+
+# Web Framework
+fastapi==0.109.2
+uvicorn[standard]==0.27.1
+websockets==12.0
+starlette==0.36.3
+
+# LLM Integration
+litellm==1.52.0
+
+# HTTP Client
+httpx==0.27.0
+
+# Utilities
+python-multipart==0.0.9
+pydantic==2.6.1
+
+# Async
+aiofiles==23.2.1
