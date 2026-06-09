@@ -10,7 +10,7 @@
 
 ### 1.2 Objetivos
 - Criar um agente de IA autônomo capaz de executar comandos e interagir com o sistema
-- Fornecer interface web moderna e intuitiva
+- Fornecer interface web moderna e intuitiva (estilo OpenHands)
 - Permitir integração com múltiplos provedores de LLM
 - Suportar ferramentas nativas como terminal, editor de arquivos, git, e browser
 
@@ -22,6 +22,28 @@
 | LLM Integration | LiteLLM Proxy |
 | Tunnel | Cloudflare Tunnel |
 | Runtime | Debian 13 (Trixie) |
+
+---
+
+## 2. Design System - Paleta de Cores
+
+### Cores do Projeto (DARK THEME)
+| Nome | Hex | Uso |
+|------|-----|-----|
+| Primary | #8B5CF6 | Botões, links, acentos (roxo violeta) |
+| Primary Dark | #7C3AED | Hover states |
+| Secondary | #06B6D4 | Cyan para destaques (cor diferente do OpenHands) |
+| Background Dark | #0F172A | Fundo principal |
+| Surface | #1E293B | Cards, painéis |
+| Surface Light | #334155 | Elementos elevados |
+| Border | #475569 | Bordas |
+| Text Primary | #F8FAFC | Texto principal |
+| Text Secondary | #94A3B8 | Texto secundário |
+| Text Muted | #64748B | Placeholder, hints |
+| Success | #22C55E | Status OK, online |
+| Error | #EF4444 | Erros |
+| Warning | #F59E0B | Avisos |
+| Info | #3B82F6 | Informações |
 
 ---
 

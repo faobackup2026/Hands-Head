@@ -11,3 +11,39 @@ INFO:     2804:d59:836e:9100:d1cc:2567:c229:6ac7:0 - "GET / HTTP/1.1" 200 OK
 INFO:     2804:d59:836e:9100:d1cc:2567:c229:6ac7:0 - "GET /favicon.ico HTTP/1.1" 404 Not Found
 INFO:     2804:d59:836e:9100:d1cc:2567:c229:6ac7:0 - "WebSocket /ws" [accepted]
 INFO:     connection open
+INFO:     connection closed
+
+[1;31mGive Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new[0m
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+
+[1;31mProvider List: https://docs.litellm.ai/docs/providers[0m
+
+Cliente desconectado
+INFO:     127.0.0.1:45764 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:45778 - "GET /api/config HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53774 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57718 - "GET / HTTP/1.1" 200 OK
+INFO:     2804:d59:836e:9100:d1cc:2567:c229:6ac7:0 - "GET / HTTP/1.1" 200 OK
+INFO:     2804:d59:836e:9100:d1cc:2567:c229:6ac7:0 - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     connection closed
+
+[1;31mGive Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new[0m
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+
+[1;31mProvider List: https://docs.litellm.ai/docs/providers[0m
+
+
+[1;31mGive Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new[0m
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+
+[1;31mProvider List: https://docs.litellm.ai/docs/providers[0m
+
+Cliente desconectado
+INFO:     127.0.0.1:42684 - "GET / HTTP/1.1" 200 OK
+INFO:     2804:d59:836e:9100:d1cc:2567:c229:6ac7:0 - "GET / HTTP/1.1" 200 OK
+INFO:     2804:d59:836e:9100:d1cc:2567:c229:6ac7:0 - "WebSocket /ws" [accepted]
+INFO:     connection open
