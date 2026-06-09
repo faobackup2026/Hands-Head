@@ -4,701 +4,717 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HANDS & HEAD - AI Agent by Fao Labs</title>
+    <meta name="description" content="Let's Start Building!">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
+        
         :root {
             --primary: #8B5CF6;
             --primary-dark: #7C3AED;
             --secondary: #06B6D4;
-            --bg-dark: #0F172A;
-            --bg-surface: #1E293B;
-            --bg-surface-light: #334155;
-            --text-primary: #F8FAFC;
-            --text-secondary: #94A3B8;
-            --text-muted: #64748B;
-            --success: #22C55E;
-            --error: #EF4444;
-            --border: #475569;
+            --bg-dark: #0d0f11;
+            --bg-surface: #24272e;
+            --bg-surface-light: #2a2f38;
+            --text-primary: #f8fafc;
+            --text-secondary: #a1a1aa;
+            --text-muted: #71717a;
+            --success: #a5e75e;
+            --error: #e76a5e;
+            --warning: #f59e0b;
+            --border: #3c3c4a;
+            --content: #ecedee;
+            --content-2: #f9fbfe;
+            --font-sans: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-mono: 'IBM Plex Mono', monospace;
+            --duration-fast: 0.15s;
+            --duration-normal: 0.3s;
         }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        
+        html, body {
+            height: 100%;
+            font-family: var(--font-sans);
             background: var(--bg-dark);
             color: var(--text-primary);
-            height: 100vh;
-            overflow: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
-
-        .app { display: flex; flex-direction: column; height: 100vh; }
-
-        /* HEADER */
-        .header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            height: 48px;
-            padding: 0 16px;
+        
+        .app-container { display: flex; height: 100vh; overflow: hidden; }
+        
+        .sidebar {
+            width: 75px;
+            min-width: 75px;
+            height: 100%;
             background: var(--bg-surface);
-            border-bottom: 1px solid var(--border);
-            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            padding: 24px 0;
+            border-right: 1px solid var(--border);
         }
-
-        .header-left { display: flex; align-items: center; gap: 16px; }
-
-        .logo { display: flex; align-items: center; gap: 10px; }
-
-        .logo-icon {
-            width: 28px;
-            height: 28px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            border-radius: 6px;
+        
+        .sidebar-logo { display: flex; justify-content: center; margin-bottom: 24px; }
+        .sidebar-logo svg { width: 46px; height: 30px; }
+        
+        .sidebar-nav { display: flex; flex-direction: column; gap: 8px; padding: 0 12px; flex: 1; }
+        
+        .nav-btn {
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 12px;
-            font-weight: 700;
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: 12px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: all var(--duration-fast);
         }
-
-        .logo-text { font-size: 15px; font-weight: 700; }
-        .logo-brand { font-size: 11px; color: var(--text-muted); }
-
-        .status {
+        
+        .nav-btn:hover { background: rgba(139, 92, 246, 0.1); color: var(--primary); }
+        .nav-btn.active { background: var(--primary); color: white; }
+        .nav-btn svg { width: 24px; height: 24px; }
+        
+        .sidebar-footer { padding: 0 12px; }
+        
+        .settings-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: 12px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            color: var(--text-muted);
+            transition: all var(--duration-fast);
+        }
+        
+        .settings-btn:hover { background: var(--bg-surface-light); color: var(--text-primary); }
+        
+        .main-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        
+        .header {
+            height: 54px;
+            padding: 12px 16px;
+            background: var(--bg-surface);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+        
+        .header-left, .header-right { display: flex; align-items: center; gap: 16px; }
+        .header-center { flex: 1; display: flex; justify-content: center; }
+        
+        .new-chat-btn {
             display: flex;
             align-items: center;
             gap: 8px;
-            padding: 4px 10px;
-            background: var(--bg-surface-light);
-            border-radius: 12px;
-            font-size: 12px;
-        }
-
-        .status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--success); }
-        .status-dot.offline { background: var(--error); }
-
-        .header-right { display: flex; align-items: center; gap: 8px; }
-
-        .btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            padding: 6px 12px;
-            border: none;
-            border-radius: 6px;
-            font-size: 13px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.15s;
-            background: transparent;
-            color: var(--text-secondary);
-        }
-
-        .btn:hover { background: var(--bg-surface-light); color: var(--text-primary); }
-        .btn-primary { background: var(--primary); color: white; }
-        .btn-primary:hover { background: var(--primary-dark); }
-        .btn-icon { width: 32px; height: 32px; padding: 0; }
-        .btn svg { width: 16px; height: 16px; }
-
-        /* MAIN */
-        .main { display: flex; flex: 1; overflow: hidden; }
-
-        /* SIDEBAR */
-        .sidebar {
-            width: 200px;
-            background: var(--bg-surface);
-            border-right: 1px solid var(--border);
-            display: flex;
-            flex-direction: column;
-            flex-shrink: 0;
-        }
-
-        .sidebar-header {
-            padding: 12px 16px;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .sidebar-title {
-            font-size: 11px;
-            font-weight: 600;
-            text-transform: uppercase;
-            color: var(--text-muted);
-            letter-spacing: 0.5px;
-        }
-
-        .sidebar-content { flex: 1; overflow-y: auto; padding: 8px; }
-
-        .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 8px 12px;
-            border-radius: 6px;
-            cursor: pointer;
-            color: var(--text-secondary);
-            font-size: 13px;
-            transition: all 0.15s;
-        }
-
-        .nav-item:hover { background: var(--bg-surface-light); color: var(--text-primary); }
-        .nav-item.active { background: var(--primary); color: white; }
-        .nav-item svg { width: 18px; height: 18px; flex-shrink: 0; }
-
-        /* CHAT */
-        .chat { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-
-        .chat-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
             padding: 8px 16px;
-            background: var(--bg-surface);
-            border-bottom: 1px solid var(--border);
-            flex-shrink: 0;
-        }
-
-        .chat-title { font-size: 13px; font-weight: 600; }
-        .chat-actions { display: flex; gap: 4px; }
-
-        .chat-messages {
-            flex: 1;
-            overflow-y: auto;
-            padding: 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        .message { display: flex; gap: 10px; max-width: 80%; }
-        .message.user { align-self: flex-end; flex-direction: row-reverse; }
-
-        .message-avatar {
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            background: var(--bg-surface);
-        }
-
-        .message.assistant .message-avatar { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; }
-        .message.user .message-avatar { background: var(--primary); color: white; }
-
-        .message-content {
-            background: var(--bg-surface);
-            padding: 10px 14px;
-            border-radius: 10px;
-            border: 1px solid var(--border);
-        }
-
-        .message.user .message-content { background: var(--primary); border-color: var(--primary); }
-
-        .message-text { font-size: 14px; line-height: 1.5; white-space: pre-wrap; }
-        .message.user .message-text { color: white; }
-        .message-time { font-size: 10px; color: var(--text-muted); margin-top: 4px; }
-        .message.user .message-time { color: rgba(255,255,255,0.7); }
-
-        .message pre {
-            background: var(--bg-dark);
-            padding: 10px;
-            border-radius: 6px;
-            margin-top: 8px;
-            overflow-x: auto;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 12px;
-        }
-
-        .message.user pre { background: rgba(0,0,0,0.2); }
-
-        .empty-state {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 40px;
-            text-align: center;
-        }
-
-        .empty-icon {
-            width: 56px;
-            height: 56px;
-            background: var(--bg-surface);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 16px;
-        }
-
-        .empty-icon svg { width: 28px; height: 28px; color: var(--text-muted); }
-        .empty-title { font-size: 16px; font-weight: 600; margin-bottom: 8px; }
-        .empty-text { font-size: 14px; color: var(--text-muted); max-width: 400px; }
-
-        .input-area {
-            padding: 12px 16px;
-            background: var(--bg-surface);
-            border-top: 1px solid var(--border);
-            flex-shrink: 0;
-        }
-
-        .input-container { display: flex; gap: 10px; align-items: flex-end; }
-
-        .chat-input {
-            flex: 1;
-            background: var(--bg-dark);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 10px 14px;
-            font-size: 14px;
-            font-family: inherit;
-            color: var(--text-primary);
-            resize: none;
-            min-height: 42px;
-            max-height: 120px;
-            outline: none;
-            transition: border-color 0.15s;
-        }
-
-        .chat-input:focus { border-color: var(--primary); }
-        .chat-input::placeholder { color: var(--text-muted); }
-
-        .send-btn {
-            width: 42px;
-            height: 42px;
             background: var(--primary);
             border: none;
             border-radius: 8px;
             color: white;
+            font-size: 14px;
+            font-weight: 500;
             cursor: pointer;
+            transition: background var(--duration-fast);
+        }
+        
+        .new-chat-btn:hover { background: var(--primary-dark); }
+        .new-chat-btn svg { width: 18px; height: 18px; }
+        
+        .model-selector {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            background: var(--bg-surface-light);
+            border-radius: 20px;
+            font-size: 12px;
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+        
+        .model-selector:hover { background: var(--border); }
+        .model-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--success); }
+        
+        .header-btn {
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.15s;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: all var(--duration-fast);
         }
-
+        
+        .header-btn:hover { background: var(--bg-surface-light); color: var(--text-primary); }
+        
+        .chat-area { flex: 1; display: flex; overflow: hidden; }
+        .chat-main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .chat-messages { flex: 1; overflow-y: auto; padding: 24px; }
+        
+        .welcome-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .welcome-logo { width: 120px; height: 80px; margin-bottom: 32px; }
+        
+        .welcome-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .welcome-subtitle {
+            font-size: 16px;
+            color: var(--text-secondary);
+            max-width: 500px;
+            line-height: 1.6;
+        }
+        
+        .welcome-tasks {
+            margin-top: 48px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
+            max-width: 600px;
+        }
+        
+        .task-card {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 20px;
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all var(--duration-fast);
+            text-align: left;
+        }
+        
+        .task-card:hover { border-color: var(--primary); background: var(--bg-surface-light); }
+        
+        .task-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: var(--bg-surface-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+        }
+        
+        .task-content { flex: 1; }
+        .task-title { font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; }
+        .task-desc { font-size: 12px; color: var(--text-muted); }
+        
+        .message { display: flex; gap: 16px; margin-bottom: 24px; max-width: 80%; }
+        .message.user { flex-direction: row-reverse; margin-left: auto; }
+        
+        .message-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--bg-surface);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            color: var(--primary);
+        }
+        
+        .message.assistant .message-avatar { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; }
+        .message.user .message-avatar { background: var(--primary); color: white; }
+        
+        .message-content { flex: 1; }
+        
+        .message-bubble {
+            padding: 12px 16px;
+            background: var(--bg-surface);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+        }
+        
+        .message.user .message-bubble { background: var(--primary); border-color: var(--primary); }
+        
+        .message-text { font-size: 14px; line-height: 1.6; color: var(--text-primary); }
+        .message.user .message-text { color: white; }
+        
+        .message pre {
+            background: var(--bg-dark);
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 12px;
+            overflow-x: auto;
+            font-family: var(--font-mono);
+            font-size: 13px;
+        }
+        
+        .message.user pre { background: rgba(0, 0, 0, 0.2); }
+        
+        .input-area { padding: 16px 24px 24px; background: var(--bg-dark); }
+        
+        .input-container {
+            display: flex;
+            align-items: flex-end;
+            gap: 12px;
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 12px 16px;
+        }
+        
+        .input-container:focus-within { border-color: var(--primary); }
+        
+        .chat-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            font-size: 14px;
+            font-family: var(--font-sans);
+            color: var(--text-primary);
+            resize: none;
+            max-height: 120px;
+            line-height: 1.5;
+        }
+        
+        .chat-input::placeholder { color: var(--text-muted); }
+        
+        .input-actions { display: flex; align-items: center; gap: 8px; }
+        
+        .input-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            color: var(--text-muted);
+            transition: all var(--duration-fast);
+        }
+        
+        .input-btn:hover { background: var(--bg-surface-light); color: var(--text-primary); }
+        .send-btn { background: var(--primary); color: white; }
         .send-btn:hover { background: var(--primary-dark); }
-        .send-btn:disabled { background: var(--bg-surface-light); cursor: not-allowed; }
-        .send-btn svg { width: 18px; height: 18px; }
-
-        /* RIGHT PANEL */
+        
         .right-panel {
-            width: 280px;
+            width: 400px;
+            min-width: 400px;
             background: var(--bg-surface);
             border-left: 1px solid var(--border);
             display: flex;
             flex-direction: column;
-            flex-shrink: 0;
         }
-
-        .panel-tabs { display: flex; border-bottom: 1px solid var(--border); }
-
+        
+        .panel-tabs { display: flex; border-bottom: 1px solid var(--border); padding: 0 16px; }
+        
         .panel-tab {
-            flex: 1;
-            padding: 10px;
-            text-align: center;
-            font-size: 12px;
+            padding: 12px 16px;
+            font-size: 13px;
+            font-weight: 500;
             color: var(--text-muted);
-            cursor: pointer;
-            border-bottom: 2px solid transparent;
-            transition: all 0.15s;
-        }
-
-        .panel-tab:hover { color: var(--text-secondary); }
-        .panel-tab.active { color: var(--primary); border-bottom-color: var(--primary); }
-
-        .panel-content { flex: 1; overflow-y: auto; padding: 12px; }
-
-        .actions-list { display: flex; flex-direction: column; gap: 8px; }
-
-        .action-item {
-            display: flex;
-            align-items: flex-start;
-            gap: 10px;
-            padding: 8px 10px;
-            background: var(--bg-dark);
-            border-radius: 6px;
-        }
-
-        .action-tool {
-            font-size: 10px;
-            font-weight: 600;
-            color: var(--primary);
-            padding: 2px 6px;
-            background: rgba(139, 92, 246, 0.15);
-            border-radius: 4px;
-            flex-shrink: 0;
-        }
-
-        .action-content { flex: 1; font-size: 12px; color: var(--text-secondary); line-height: 1.4; }
-
-        .terminal-output {
-            background: #000;
-            border-radius: 6px;
-            padding: 10px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 11px;
-            line-height: 1.5;
-            min-height: 150px;
-            color: #00ff00;
-        }
-
-        .terminal-line { margin-bottom: 2px; }
-
-        .terminal-input {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            margin-top: 8px;
-            padding: 6px 10px;
-            background: var(--bg-dark);
-            border-radius: 6px;
-        }
-
-        .terminal-prompt { color: var(--success); font-size: 11px; }
-
-        .terminal-cmd {
-            flex: 1;
             background: transparent;
             border: none;
-            color: var(--text-primary);
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 11px;
-            outline: none;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all var(--duration-fast);
         }
-
-        .file-tree { font-size: 12px; }
-
-        .tree-item {
+        
+        .panel-tab:hover { color: var(--text-primary); }
+        .panel-tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+        
+        .panel-content { flex: 1; overflow: hidden; display: none; }
+        .panel-content.active { display: flex; flex-direction: column; }
+        
+        .terminal-container { flex: 1; padding: 16px; overflow: hidden; }
+        
+        .terminal-output {
+            flex: 1;
+            background: var(--bg-dark);
+            border-radius: 8px;
+            padding: 16px;
+            font-family: var(--font-mono);
+            font-size: 13px;
+            overflow-y: auto;
+            max-height: 300px;
+        }
+        
+        .terminal-line { margin-bottom: 8px; color: var(--text-secondary); }
+        .terminal-line.command { color: var(--primary); }
+        .terminal-line.error { color: var(--error); }
+        .terminal-line.success { color: var(--success); }
+        
+        .files-container { flex: 1; padding: 16px; overflow-y: auto; }
+        .file-tree { display: flex; flex-direction: column; gap: 4px; }
+        
+        .file-item {
             display: flex;
             align-items: center;
-            gap: 6px;
-            padding: 4px 8px;
-            border-radius: 4px;
+            gap: 8px;
+            padding: 8px 12px;
+            border-radius: 6px;
             cursor: pointer;
             color: var(--text-secondary);
+            font-size: 13px;
+            transition: all var(--duration-fast);
         }
-
-        .tree-item:hover { background: var(--bg-dark); color: var(--text-primary); }
-        .tree-item.folder { color: var(--secondary); }
-        .tree-icon { width: 14px; height: 14px; }
-
-        /* MODAL */
+        
+        .file-item:hover { background: var(--bg-surface-light); color: var(--text-primary); }
+        .file-item.folder { font-weight: 500; }
+        .file-icon { width: 16px; height: 16px; color: var(--primary); }
+        
         .modal-overlay {
-            display: none;
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.6);
-            z-index: 100;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
             align-items: center;
             justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all var(--duration-normal);
         }
-
-        .modal-overlay.visible { display: flex; }
-
+        
+        .modal-overlay.visible { opacity: 1; visibility: visible; }
+        
         .modal {
             background: var(--bg-surface);
-            border-radius: 10px;
-            width: 420px;
-            max-width: 90%;
-            border: 1px solid var(--border);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            border-radius: 16px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow: hidden;
+            transform: scale(0.95);
+            transition: transform var(--duration-normal);
         }
-
+        
+        .modal-overlay.visible .modal { transform: scale(1); }
+        
         .modal-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 14px 16px;
+            padding: 20px 24px;
             border-bottom: 1px solid var(--border);
         }
-
-        .modal-title { font-size: 15px; font-weight: 600; }
-
+        
+        .modal-title { font-size: 18px; font-weight: 600; }
+        
         .modal-close {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
             background: transparent;
             border: none;
-            color: var(--text-muted);
             cursor: pointer;
-            font-size: 18px;
-            padding: 4px;
+            color: var(--text-muted);
+            transition: all var(--duration-fast);
         }
-
-        .modal-close:hover { color: var(--text-primary); }
-        .modal-body { padding: 16px; }
-        .form-group { margin-bottom: 14px; }
-
-        .form-label {
-            display: block;
-            font-size: 12px;
-            font-weight: 500;
-            color: var(--text-secondary);
-            margin-bottom: 6px;
-        }
-
+        
+        .modal-close:hover { background: var(--bg-surface-light); color: var(--text-primary); }
+        .modal-body { padding: 24px; overflow-y: auto; }
+        
+        .form-group { margin-bottom: 20px; }
+        .form-label { display: block; font-size: 13px; font-weight: 500; color: var(--text-secondary); margin-bottom: 8px; }
+        
         .form-input {
             width: 100%;
-            padding: 8px 12px;
+            padding: 10px 14px;
             background: var(--bg-dark);
             border: 1px solid var(--border);
-            border-radius: 6px;
-            font-size: 13px;
+            border-radius: 8px;
+            font-size: 14px;
             color: var(--text-primary);
             outline: none;
+            transition: border-color var(--duration-fast);
         }
-
+        
         .form-input:focus { border-color: var(--primary); }
-
+        
         .form-select {
             width: 100%;
-            padding: 8px 12px;
+            padding: 10px 14px;
             background: var(--bg-dark);
             border: 1px solid var(--border);
-            border-radius: 6px;
-            font-size: 13px;
+            border-radius: 8px;
+            font-size: 14px;
             color: var(--text-primary);
             outline: none;
+            cursor: pointer;
         }
-
-        /* TOAST */
-        .toast-container {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            z-index: 200;
+        
+        .form-btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--primary);
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            color: white;
+            cursor: pointer;
+            transition: background var(--duration-fast);
         }
-
+        
+        .form-btn:hover { background: var(--primary-dark); }
+        
+        @keyframes bounce { 0%, 100% { transform: translateY(-25%); animation-timing-function: cubic-bezier(0.8, 0, 1, 1); } 50% { transform: translateY(0); animation-timing-function: cubic-bezier(0, 0, 0.2, 1); } }
+        
+        .typing-indicator { display: flex; gap: 4px; padding: 4px 0; }
+        .typing-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--text-muted); animation: bounce 1s infinite; }
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+        
+        .toast-container { position: fixed; bottom: 24px; right: 24px; display: flex; flex-direction: column; gap: 8px; z-index: 1001; }
+        
         .toast {
-            padding: 10px 16px;
+            padding: 12px 20px;
             background: var(--bg-surface);
             border: 1px solid var(--border);
             border-radius: 8px;
-            font-size: 13px;
+            font-size: 14px;
+            color: var(--text-primary);
             animation: slideIn 0.3s ease;
         }
-
-        .toast.success { border-left: 3px solid var(--success); }
-        .toast.error { border-left: 3px solid var(--error); }
-
-        @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-
-        /* TYPING */
-        .typing {
-            display: none;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 12px;
-            background: var(--bg-surface);
-            border-radius: 8px;
-            width: fit-content;
-        }
-
-        .typing.visible { display: flex; }
-
-        .typing-dots { display: flex; gap: 3px; }
-
-        .typing-dot {
-            width: 5px;
-            height: 5px;
-            background: var(--primary);
-            border-radius: 50%;
-            animation: bounce 1.4s infinite;
-        }
-
-        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
-        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
-
-        @keyframes bounce {
-            0%, 60%, 100% { transform: translateY(0); }
-            30% { transform: translateY(-4px); }
-        }
-
-        /* SCROLLBAR */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: var(--bg-surface-light); border-radius: 3px; }
-
-        /* RESPONSIVE */
+        
+        .toast.success { border-color: var(--success); }
+        .toast.error { border-color: var(--error); }
+        
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        
         @media (max-width: 1024px) { .right-panel { display: none; } }
-        @media (max-width: 768px) { .sidebar { display: none; } .message { max-width: 95%; } }
+        @media (max-width: 768px) { .sidebar { width: 60px; min-width: 60px; } .welcome-title { font-size: 24px; } }
     </style>
 </head>
 <body>
-    <div class="app">
-        <!-- HEADER -->
-        <header class="header">
-            <div class="header-left">
-                <div class="logo">
-                    <div class="logo-icon">HH</div>
-                    <div>
-                        <div class="logo-text">HANDS & HEAD</div>
-                        <div class="logo-brand">by Fao Labs</div>
-                    </div>
-                </div>
-                <div class="status">
-                    <span class="status-dot" id="statusDot"></span>
-                    <span id="statusText">Conectando...</span>
-                </div>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <svg width="46" height="30" viewBox="0 0 148 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M71.754 16.863V2.97414C71.754 1.82355 72.6871 0.890503 73.8377 0.890503C74.9883 0.890503 75.9213 1.82355 75.9213 2.97414V16.863C75.9213 18.0136 74.9883 18.9466 73.8377 18.9466C72.6871 18.9466 71.754 18.0136 71.754 16.863Z" fill="#8B5CF6"/>
+                    <path d="M82.5273 18.9329L89.4717 6.90477C90.047 5.90832 91.3215 5.5668 92.318 6.1421C93.3144 6.7174 93.6559 7.99197 93.0806 8.98841L86.1362 21.0165C85.5609 22.0129 84.2864 22.3545 83.2899 21.7792C82.2935 21.2039 81.952 19.9293 82.5273 18.9329Z" fill="#8B5CF6"/>
+                    <path d="M65.1481 18.9329L58.2037 6.90477C57.6284 5.90832 56.3538 5.5668 55.3574 6.1421C54.3609 6.7174 54.0194 7.99197 54.5947 8.98841L61.5391 21.0165C62.1144 22.0129 63.389 22.3545 64.3854 21.7792C65.3819 21.2039 65.7234 19.9293 65.1481 18.9329Z" fill="#8B5CF6"/>
+                    <path d="M98.5045 92.4969C95.1427 89.7602 90.8793 83.6628 89.0929 77.664C86.8598 70.1655 82.0309 62.777 80.9578 60.9138C80.0056 59.2602 83.0313 53.2605 89.0929 58.0459C93.9421 61.8742 97.3878 68.466 98.5045 71.2833C98.9566 72.4239 103.006 79.2475 101.827 56.6051C101.455 49.445 100.49 44.3126 100.036 33.9388C99.6807 25.7997 101.824 23.057 105.11 23.057C108.396 23.057 111.106 24.1244 111.106 32.4283C111.106 22.8682 113.154 20.7141 117.646 20.7147C121.39 20.7153 123.069 23.9077 123.069 27.0952V32.5084C123.069 27.0952 126.669 26.5896 128.519 26.5896C130.37 26.5896 134.076 28.1957 134.076 32.5084V43.317C134.076 38.116 137.324 36.601 139.773 36.765C142.963 36.9786 144.405 39.2382 143.965 44.3126C143.651 47.9349 142.689 58.5273 142.689 62.0291C142.689 65.1712 143.965 71.6801 142.689 77.664C141.953 81.1168 140.137 90.2628 130.885 94.4102C121.634 98.5575 105.364 98.0807 98.5045 92.4969Z" fill="#06B6D4"/>
+                    <path d="M140.606 62.0292C140.606 58.409 141.583 47.6748 141.89 44.1323C142.097 41.7374 141.809 40.4247 141.424 39.7542C141.141 39.2626 140.699 38.915 139.634 38.8436C138.865 38.7921 138.027 39.0114 137.401 39.5761C136.814 40.1052 136.159 41.1682 136.159 43.3176L136.155 43.4388L135.198 59.758C135.164 60.3451 134.883 60.8911 134.424 61.2599C133.966 61.6284 133.374 61.7859 132.793 61.6941L122.764 60.1068L111.948 58.6703C110.949 58.5376 110.188 57.7084 110.142 56.7016L109.545 43.8055L109.54 43.6959C109.274 38.5609 109.022 33.8767 109.022 32.4282C109.022 28.3859 108.338 26.6806 107.74 25.9634C107.263 25.3915 106.577 25.1402 105.11 25.1402C104.583 25.1402 104.212 25.2481 103.933 25.4111C103.659 25.5714 103.346 25.8587 103.049 26.4208C102.41 27.6257 101.945 29.891 102.118 33.8479C102.342 38.9804 102.692 42.8146 103.035 46.2718C103.377 49.7231 103.718 52.8561 103.908 56.4971C104.204 62.1966 104.178 66.1256 103.945 68.7924C103.828 70.124 103.656 71.1996 103.423 72.0501C103.202 72.8558 102.871 73.6757 102.296 74.2887C101.6 75.0303 100.608 75.3844 99.577 75.136C98.7592 74.9389 98.1847 74.4215 97.8706 74.0916C97.2141 73.4017 96.7501 72.5106 96.568 72.0512C95.5097 69.3812 92.2352 63.1808 87.8023 59.6811C86.5089 58.6599 85.5666 58.3652 84.9736 58.3204C84.4148 58.2783 84.0094 58.4436 83.6909 58.6967C83.34 58.9756 83.0781 59.3811 82.9479 59.7643C82.9019 59.8999 82.8823 59.9968 82.8741 60.0584C84.0759 62.0865 88.8421 69.5222 91.0896 77.069C92.7648 82.6941 96.8038 88.4259 99.8194 90.8809C102.74 93.258 107.988 94.7313 113.9 95.0218C119.756 95.3095 125.788 94.4121 130.033 92.5092C138.233 88.8334 139.903 80.7382 140.651 77.2292C141.232 74.5057 141.243 71.5987 141.087 68.9009C141.01 67.5551 140.894 66.2969 140.793 65.1373C140.695 64.0105 140.606 62.9215 140.606 62.0292ZM120.986 27.0953C120.986 25.8314 120.648 24.7049 120.089 23.9514C119.583 23.27 118.84 22.7987 117.646 22.7984C116.668 22.7982 116.011 22.9187 115.546 23.1167C115.13 23.2943 114.781 23.5699 114.463 24.0831C113.73 25.2671 113.192 27.6455 113.189 32.384L113.707 43.6021C113.901 47.3443 114.103 51.3994 114.236 54.7707L120.986 55.6666V27.0953ZM125.153 56.2652L131.172 57.218L131.992 43.267V32.5083C131.992 31.031 131.39 30.1275 130.678 29.5489C129.884 28.9039 128.957 28.6731 128.519 28.6731C127.722 28.6731 126.899 28.797 126.306 29.2179C125.849 29.5421 125.153 30.3087 125.153 32.5083V56.2652ZM136.159 35.4278C137.406 34.8069 138.74 34.6083 139.912 34.6868C142.037 34.8292 143.91 35.718 145.037 37.6779C146.06 39.4592 146.273 41.8136 146.041 44.4927C145.72 48.1949 144.772 58.6457 144.772 62.0292C144.772 62.708 144.843 63.6116 144.944 64.7758C145.042 65.907 145.165 67.2389 145.247 68.6606C145.411 71.4987 145.422 74.8383 144.727 78.0987C144.002 81.4953 142.041 91.6918 131.738 96.3108C126.731 98.5551 120.002 99.4936 113.696 99.1838C107.445 98.8767 101.128 97.3189 97.1887 94.1122C93.4809 91.0936 88.9938 84.6307 87.0962 78.2589C84.9529 71.0619 80.3109 63.9646 79.1527 61.9533C78.4706 60.7689 78.684 59.3628 79.0019 58.4258C79.3607 57.3688 80.0554 56.2631 81.0993 55.4337C82.1758 54.5784 83.6043 54.0377 85.2876 54.1647C86.9369 54.2893 88.6462 55.0393 90.3834 56.4107C94.8541 59.9401 98.1342 65.5082 99.7424 68.9231C99.759 68.7664 99.779 68.6024 99.7941 68.4298C100.003 66.0435 100.039 62.3344 99.7467 56.7132C99.5635 53.1942 99.2356 50.1809 98.8888 46.6828C98.5425 43.1904 98.184 39.2713 97.955 34.0302C97.7722 29.8481 98.2012 26.6722 99.3672 24.471C99.9716 23.3302 100.79 22.4223 101.83 21.814C102.866 21.2087 103.995 20.974 105.11 20.974C106.759 20.974 108.813 21.2062 110.448 22.7678C110.593 22.4576 110.75 22.1652 110.921 21.8899C111.676 20.6698 112.681 19.8084 113.912 19.2835C115.095 18.7791 116.378 18.6309 117.646 18.6311C120.195 18.6315 122.165 19.7565 123.435 21.4683C124.257 22.576 124.75 23.8776 124.985 25.1982C126.338 24.5876 127.691 24.5068 128.519 24.5068C129.933 24.5068 131.784 25.0791 133.305 26.3154C134.908 27.6179 136.159 29.6733 136.159 32.5083V35.4278Z" fill="#8B5CF6"/>
+                    <path d="M49.258 92.4969C52.6198 89.7602 56.8832 83.6628 58.6696 77.664C60.9027 70.1655 65.7316 62.777 66.8047 60.9138C67.757 59.2602 64.7312 53.2605 58.6696 58.0459C53.8204 61.8742 50.3747 68.466 49.258 71.2833C48.8059 72.4239 44.7566 79.2475 45.935 56.6051C46.3077 49.445 47.2728 44.3126 47.7261 33.9388C48.0818 25.7997 45.9381 23.057 42.6523 23.057C39.3666 23.057 36.6568 24.1244 36.6568 32.4283C36.6568 22.8682 34.6087 20.7141 30.1168 20.7147C26.3728 20.7153 24.6934 23.9077 24.6934 27.0952V32.5084C24.6934 27.0952 21.0938 26.5896 19.243 26.5896C17.3923 26.5896 13.687 28.1957 13.687 32.5084V43.317C13.687 38.116 10.4388 36.601 7.98968 36.765C4.79943 36.9786 3.3574 39.2382 3.79721 44.3126C4.11115 47.9349 5.07331 58.5273 5.07331 62.0291C5.07331 65.1712 3.79721 71.6801 5.07331 77.664C5.80964 81.1168 7.62551 90.2628 16.8772 94.4102C26.129 98.5575 42.3987 98.0807 49.258 92.4969Z" fill="#06B6D4"/>
+                    <path d="M7.15667 62.0292C7.15667 58.409 6.18001 47.6748 5.87297 44.1323C5.66546 41.7374 5.95363 40.4247 6.33881 39.7542C6.62122 39.2626 7.06342 38.915 8.1284 38.8436C8.89765 38.7921 9.7355 39.0114 10.3617 39.5761C10.9484 40.1052 11.6032 41.1682 11.6032 43.3176L11.6075 43.4388L12.5644 59.758C12.5989 60.3451 12.8798 60.8911 13.338 61.2599C13.7961 61.6284 14.3888 61.7859 14.9695 61.6941L24.9988 60.1068L35.8144 58.6703C36.8136 58.5376 37.5741 57.7084 37.6208 56.7016L38.2174 43.8055L38.2226 43.6959C38.4887 38.5609 38.7401 33.8767 38.7401 32.4282C38.7401 28.3859 39.4246 26.6806 40.0228 25.9634C40.4997 25.3915 41.1851 25.1402 42.6523 25.1402C43.1795 25.1402 43.5506 25.2481 43.8296 25.4111C44.1038 25.5714 44.416 25.8587 44.7139 26.4208C45.3521 27.6257 45.8174 29.891 45.6445 33.8479C45.4202 38.9804 45.0703 42.8146 44.7276 46.2718C44.3854 49.7231 44.0444 52.8561 43.8549 56.4971C43.5583 62.1966 43.5848 66.1256 43.818 68.7924C43.9345 70.124 44.107 71.1996 44.3397 72.0501C44.5602 72.8558 44.891 73.6757 45.4664 74.2887C46.1626 75.0303 47.1547 75.3844 48.1855 75.136C49.0033 74.9389 49.5779 74.4215 49.8919 74.0916C50.5484 73.4017 51.0124 72.5106 51.1945 72.0512C52.2528 69.3812 55.5273 63.1808 59.9602 59.6811C61.2536 58.6599 62.1959 58.3652 62.7889 58.3204C63.3477 58.2783 63.7531 58.4436 64.0716 58.6967C64.4225 58.9756 64.6844 59.3811 64.8146 59.7643C64.8606 59.8999 64.8802 59.9968 64.8884 60.0584C63.6866 62.0865 58.9205 69.5222 56.6729 77.069C54.9978 82.6941 50.9587 88.4259 47.9431 90.8809C45.0229 93.258 39.7748 94.7313 33.8625 95.0218C28.0069 95.3095 21.9748 94.4121 17.7298 92.5092C9.52994 88.8334 7.85968 80.7382 7.11135 77.2292C6.5306 74.5057 6.51956 71.5987 6.67502 68.9009C6.75257 67.5551 6.86815 66.2969 6.96907 65.1373C7.06713 64.0105 7.15666 62.9215 7.15667 62.0292ZM26.7768 27.0953C26.7768 25.8314 27.1148 24.7049 27.6737 23.9514C28.1793 23.27 28.9221 22.7987 30.1168 22.7984C31.0942 22.7982 31.7519 22.9187 32.2162 23.1167C32.6327 23.2943 32.9818 23.5699 33.2997 24.0831C34.0329 25.2671 34.5706 27.6455 34.5739 32.384L34.0554 43.6021C33.8615 47.3443 33.6592 51.3994 33.5263 54.7707L26.7768 55.6666V27.0953ZM22.6096 56.2652L16.5905 57.218L15.7705 43.267V32.5083C15.7705 31.031 16.3726 30.1275 17.0848 29.5489C17.8786 28.9039 18.8059 28.6731 19.2433 28.6731C20.0405 28.6731 20.8635 28.797 21.4565 29.2179C21.9131 29.5421 22.6095 30.3087 22.6096 32.5083V56.2652ZM11.6032 35.4278C10.3568 34.8069 9.02271 34.6083 7.85016 34.6868C5.72547 34.8292 3.85203 35.718 2.7259 37.6779C1.70253 39.4592 1.4893 41.8136 1.7215 44.4927C2.04237 48.1949 2.99044 58.6457 2.99044 62.0292C2.99043 62.708 2.91997 63.6116 2.81865 64.7758C2.7202 65.907 2.59705 67.2389 2.51511 68.6606C2.35156 71.4987 2.34047 74.8383 3.03576 78.0987C3.76011 81.4953 5.7216 91.6918 16.0245 96.3108C21.0312 98.5551 27.7601 99.4936 34.0669 99.1838C40.3173 98.8767 46.6346 97.3189 50.5738 94.1122C54.2816 91.0936 58.7687 84.6307 60.6663 78.2589C62.8096 71.0619 67.4516 63.9646 68.6099 61.9533C69.292 60.7689 69.0785 59.3628 68.7606 58.4258C68.4018 57.3688 67.7071 56.2631 66.6632 55.4337C65.5867 54.5784 64.1582 54.0377 62.4749 54.1647C60.8256 54.2893 59.1163 55.0393 57.3791 56.4107C52.9084 59.9401 49.6283 65.5082 48.0201 68.9231C48.0035 68.7664 47.9835 68.6024 47.9684 68.4298C47.7597 66.0435 47.7233 62.3344 48.0159 56.7132C48.199 53.1942 48.5269 50.1809 48.8738 46.6828C49.22 43.1904 49.5785 39.2713 49.8076 34.0302C49.9903 29.8481 49.5613 26.6722 48.3953 24.471C47.7909 23.3302 46.9729 22.4223 45.9322 21.814C44.8964 21.2087 43.7676 20.974 42.6523 20.974C41.0038 20.974 38.9498 21.2062 37.3141 22.7678C37.1699 22.4576 37.0125 22.1652 36.842 21.8899C36.0864 20.6698 35.0817 19.8084 33.8509 19.2835C32.668 18.7791 31.3849 18.6309 30.1168 18.6311C27.5676 18.6315 25.5976 19.7565 24.3275 21.4683C23.5057 22.576 23.0121 23.8776 22.7771 25.1982C21.4248 24.5876 20.0718 24.5068 19.2433 24.5068C17.8299 24.5068 15.9789 25.0791 14.4573 26.3154C12.8543 27.6179 11.6033 29.6733 11.6032 32.5083V35.4278Z" fill="#8B5CF6"/>
+                </svg>
             </div>
-            <div class="header-right">
-                <button class="btn" onclick="toggleTerminal()" title="Terminal">
+            
+            <nav class="sidebar-nav">
+                <button class="nav-btn active" title="New Chat">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+                </button>
+                <button class="nav-btn" title="Terminal">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polyline points="4 17 10 11 4 5"></polyline>
-                        <line x1="12" y1="19" x2="20" y2="19"></line>
+                        <polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/>
                     </svg>
                 </button>
-                <button class="btn" onclick="toggleFiles()" title="Arquivos">
+                <button class="nav-btn" title="Files">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
                     </svg>
                 </button>
-                <button class="btn btn-primary" onclick="openSettings()">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="3"></circle>
-                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <button class="settings-btn" title="Settings" onclick="openSettings()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+                        <circle cx="12" cy="12" r="3"/>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
                     </svg>
-                    Config
                 </button>
             </div>
-        </header>
-
-        <!-- MAIN -->
-        <div class="main">
-            <!-- SIDEBAR -->
-            <aside class="sidebar">
-                <div class="sidebar-header">
-                    <div class="sidebar-title">Ferramentas</div>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="header">
+                <div class="header-left">
+                    <button class="new-chat-btn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+                        New Project
+                    </button>
                 </div>
-                <div class="sidebar-content">
-                    <div class="nav-item active" data-view="chat">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-                        </svg>
-                        <span>Chat</span>
-                    </div>
-                    <div class="nav-item" data-view="terminal">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polyline points="4 17 10 11 4 5"></polyline>
-                            <line x1="12" y1="19" x2="20" y2="19"></line>
-                        </svg>
-                        <span>Terminal</span>
-                    </div>
-                    <div class="nav-item" data-view="files">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
-                        </svg>
-                        <span>Arquivos</span>
-                    </div>
-                    <div class="nav-item" data-view="git">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="18" cy="18" r="3"></circle>
-                            <circle cx="6" cy="6" r="3"></circle>
-                            <path d="M6 21V9a9 9 0 0 0 9 9"></path>
-                        </svg>
-                        <span>Git</span>
+                <div class="header-center">
+                    <div class="model-selector">
+                        <span class="model-dot"></span>
+                        <span>litellm_proxy/minimax-m2.7</span>
                     </div>
                 </div>
-            </aside>
-
-            <!-- CHAT AREA -->
-            <main class="chat">
-                <div class="chat-header">
-                    <div class="chat-title">Nova Conversa</div>
-                    <div class="chat-actions">
-                        <button class="btn btn-icon" onclick="clearChat()" title="Limpar">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polyline points="3 6 5 6 21 6"></polyline>
-                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                <div class="header-right">
+                    <button class="header-btn" title="GitHub">
+                        <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+                            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                        </svg>
+                    </button>
+                </div>
+            </header>
+            
+            <div class="chat-area">
+                <div class="chat-main">
+                    <div class="chat-messages" id="chatMessages">
+                        <div class="welcome-screen" id="welcomeScreen">
+                            <svg class="welcome-logo" viewBox="0 0 148 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M71.754 16.863V2.97414C71.754 1.82355 72.6871 0.890503 73.8377 0.890503C74.9883 0.890503 75.9213 1.82355 75.9213 2.97414V16.863C75.9213 18.0136 74.9883 18.9466 73.8377 18.9466C72.6871 18.9466 71.754 18.0136 71.754 16.863Z" fill="#8B5CF6"/>
+                                <path d="M82.5273 18.9329L89.4717 6.90477C90.047 5.90832 91.3215 5.5668 92.318 6.1421C93.3144 6.7174 93.6559 7.99197 93.0806 8.98841L86.1362 21.0165C85.5609 22.0129 84.2864 22.3545 83.2899 21.7792C82.2935 21.2039 81.952 19.9293 82.5273 18.9329Z" fill="#8B5CF6"/>
+                                <path d="M65.1481 18.9329L58.2037 6.90477C57.6284 5.90832 56.3538 5.5668 55.3574 6.1421C54.3609 6.7174 54.0194 7.99197 54.5947 8.98841L61.5391 21.0165C62.1144 22.0129 63.389 22.3545 64.3854 21.7792C65.3819 21.2039 65.7234 19.9293 65.1481 18.9329Z" fill="#8B5CF6"/>
+                                <path d="M98.5045 92.4969C95.1427 89.7602 90.8793 83.6628 89.0929 77.664C86.8598 70.1655 82.0309 62.777 80.9578 60.9138C80.0056 59.2602 83.0313 53.2605 89.0929 58.0459C93.9421 61.8742 97.3878 68.466 98.5045 71.2833C98.9566 72.4239 103.006 79.2475 101.827 56.6051C101.455 49.445 100.49 44.3126 100.036 33.9388C99.6807 25.7997 101.824 23.057 105.11 23.057C108.396 23.057 111.106 24.1244 111.106 32.4283C111.106 22.8682 113.154 20.7141 117.646 20.7147C121.39 20.7153 123.069 23.9077 123.069 27.0952V32.5084C123.069 27.0952 126.669 26.5896 128.519 26.5896C130.37 26.5896 134.076 28.1957 134.076 32.5084V43.317C134.076 38.116 137.324 36.601 139.773 36.765C142.963 36.9786 144.405 39.2382 143.965 44.3126C143.651 47.9349 142.689 58.5273 142.689 62.0291C142.689 65.1712 143.965 71.6801 142.689 77.664C141.953 81.1168 140.137 90.2628 130.885 94.4102C121.634 98.5575 105.364 98.0807 98.5045 92.4969Z" fill="#06B6D4"/>
+                                <path d="M140.606 62.0292C140.606 58.409 141.583 47.6748 141.89 44.1323C142.097 41.7374 141.809 40.4247 141.424 39.7542C141.141 39.2626 140.699 38.915 139.634 38.8436C138.865 38.7921 138.027 39.0114 137.401 39.5761C136.814 40.1052 136.159 41.1682 136.159 43.3176L136.155 43.4388L135.198 59.758C135.164 60.3451 134.883 60.8911 134.424 61.2599C133.966 61.6284 133.374 61.7859 132.793 61.6941L122.764 60.1068L111.948 58.6703C110.949 58.5376 110.188 57.7084 110.142 56.7016L109.545 43.8055L109.54 43.6959C109.274 38.5609 109.022 33.8767 109.022 32.4282C109.022 28.3859 108.338 26.6806 107.74 25.9634C107.263 25.3915 106.577 25.1402 105.11 25.1402C104.583 25.1402 104.212 25.2481 103.933 25.4111C103.659 25.5714 103.346 25.8587 103.049 26.4208C102.41 27.6257 101.945 29.891 102.118 33.8479C102.342 38.9804 102.692 42.8146 103.035 46.2718C103.377 49.7231 103.718 52.8561 103.908 56.4971C104.204 62.1966 104.178 66.1256 103.945 68.7924C103.828 70.124 103.656 71.1996 103.423 72.0501C103.202 72.8558 102.871 73.6757 102.296 74.2887C101.6 75.0303 100.608 75.3844 99.577 75.136C98.7592 74.9389 98.1847 74.4215 97.8706 74.0916C97.2141 73.4017 96.7501 72.5106 96.568 72.0512C95.5097 69.3812 92.2352 63.1808 87.8023 59.6811C86.5089 58.6599 85.5666 58.3652 84.9736 58.3204C84.4148 58.2783 84.0094 58.4436 83.6909 58.6967C83.34 58.9756 83.0781 59.3811 82.9479 59.7643C82.9019 59.8999 82.8823 59.9968 82.8741 60.0584C84.0759 62.0865 88.8421 69.5222 91.0896 77.069C92.7648 82.6941 96.8038 88.4259 99.8194 90.8809C102.74 93.258 107.988 94.7313 113.9 95.0218C119.756 95.3095 125.788 94.4121 130.033 92.5092C138.233 88.8334 139.903 80.7382 140.651 77.2292C141.232 74.5057 141.243 71.5987 141.087 68.9009C141.01 67.5551 140.894 66.2969 140.793 65.1373C140.695 64.0105 140.606 62.9215 140.606 62.0292ZM120.986 27.0953C120.986 25.8314 120.648 24.7049 120.089 23.9514C119.583 23.27 118.84 22.7987 117.646 22.7984C116.668 22.7982 116.011 22.9187 115.546 23.1167C115.13 23.2943 114.781 23.5699 114.463 24.0831C113.73 25.2671 113.192 27.6455 113.189 32.384L113.707 43.6021C113.901 47.3443 114.103 51.3994 114.236 54.7707L120.986 55.6666V27.0953ZM125.153 56.2652L131.172 57.218L131.992 43.267V32.5083C131.992 31.031 131.39 30.1275 130.678 29.5489C129.884 28.9039 128.957 28.6731 128.519 28.6731C127.722 28.6731 126.899 28.797 126.306 29.2179C125.849 29.5421 125.153 30.3087 125.153 32.5083V56.2652ZM136.159 35.4278C137.406 34.8069 138.74 34.6083 139.912 34.6868C142.037 34.8292 143.91 35.718 145.037 37.6779C146.06 39.4592 146.273 41.8136 146.041 44.4927C145.72 48.1949 144.772 58.6457 144.772 62.0292C144.772 62.708 144.843 63.6116 144.944 64.7758C145.042 65.907 145.165 67.2389 145.247 68.6606C145.411 71.4987 145.422 74.8383 144.727 78.0987C144.002 81.4953 142.041 91.6918 131.738 96.3108C126.731 98.5551 120.002 99.4936 113.696 99.1838C107.445 98.8767 101.128 97.3189 97.1887 94.1122C93.4809 91.0936 88.9938 84.6307 87.0962 78.2589C84.9529 71.0619 80.3109 63.9646 79.1527 61.9533C78.4706 60.7689 78.684 59.3628 79.0019 58.4258C79.3607 57.3688 80.0554 56.2631 81.0993 55.4337C82.1758 54.5784 83.6043 54.0377 85.2876 54.1647C86.9369 54.2893 88.6462 55.0393 90.3834 56.4107C94.8541 59.9401 98.1342 65.5082 99.7424 68.9231C99.759 68.7664 99.779 68.6024 99.7941 68.4298C100.003 66.0435 100.039 62.3344 99.7467 56.7132C99.5635 53.1942 99.2356 50.1809 98.8888 46.6828C98.5425 43.1904 98.184 39.2713 97.955 34.0302C97.7722 29.8481 98.2012 26.6722 99.3672 24.471C99.9716 23.3302 100.79 22.4223 101.83 21.814C102.866 21.2087 103.995 20.974 105.11 20.974C106.759 20.974 108.813 21.2062 110.448 22.7678C110.593 22.4576 110.75 22.1652 110.921 21.8899C111.676 20.6698 112.681 19.8084 113.912 19.2835C115.095 18.7791 116.378 18.6309 117.646 18.6311C120.195 18.6315 122.165 19.7565 123.435 21.4683C124.257 22.576 124.75 23.8776 124.985 25.1982C126.338 24.5876 127.691 24.5068 128.519 24.5068C129.933 24.5068 131.784 25.0791 133.305 26.3154C134.908 27.6179 136.159 29.6733 136.159 32.5083V35.4278Z" fill="#8B5CF6"/>
+                                <path d="M49.258 92.4969C52.6198 89.7602 56.8832 83.6628 58.6696 77.664C60.9027 70.1655 65.7316 62.777 66.8047 60.9138C67.757 59.2602 64.7312 53.2605 58.6696 58.0459C53.8204 61.8742 50.3747 68.466 49.258 71.2833C48.8059 72.4239 44.7566 79.2475 45.935 56.6051C46.3077 49.445 47.2728 44.3126 47.7261 33.9388C48.0818 25.7997 45.9381 23.057 42.6523 23.057C39.3666 23.057 36.6568 24.1244 36.6568 32.4283C36.6568 22.8682 34.6087 20.7141 30.1168 20.7147C26.3728 20.7153 24.6934 23.9077 24.6934 27.0952V32.5084C24.6934 27.0952 21.0938 26.5896 19.243 26.5896C17.3923 26.5896 13.687 28.1957 13.687 32.5084V43.317C13.687 38.116 10.4388 36.601 7.98968 36.765C4.79943 36.9786 3.3574 39.2382 3.79721 44.3126C4.11115 47.9349 5.07331 58.5273 5.07331 62.0291C5.07331 65.1712 3.79721 71.6801 5.07331 77.664C5.80964 81.1168 7.62551 90.2628 16.8772 94.4102C26.129 98.5575 42.3987 98.0807 49.258 92.4969Z" fill="#06B6D4"/>
+                                <path d="M7.15667 62.0292C7.15667 58.409 6.18001 47.6748 5.87297 44.1323C5.66546 41.7374 5.95363 40.4247 6.33881 39.7542C6.62122 39.2626 7.06342 38.915 8.1284 38.8436C8.89765 38.7921 9.7355 39.0114 10.3617 39.5761C10.9484 40.1052 11.6032 41.1682 11.6032 43.3176L11.6075 43.4388L12.5644 59.758C12.5989 60.3451 12.8798 60.8911 13.338 61.2599C13.7961 61.6284 14.3888 61.7859 14.9695 61.6941L24.9988 60.1068L35.8144 58.6703C36.8136 58.5376 37.5741 57.7084 37.6208 56.7016L38.2174 43.8055L38.2226 43.6959C38.4887 38.5609 38.7401 33.8767 38.7401 32.4282C38.7401 28.3859 39.4246 26.6806 40.0228 25.9634C40.4997 25.3915 41.1851 25.1402 42.6523 25.1402C43.1795 25.1402 43.5506 25.2481 43.8296 25.4111C44.1038 25.5714 44.416 25.8587 44.7139 26.4208C45.3521 27.6257 45.8174 29.891 45.6445 33.8479C45.4202 38.9804 45.0703 42.8146 44.7276 46.2718C44.3854 49.7231 44.0444 52.8561 43.8549 56.4971C43.5583 62.1966 43.5848 66.1256 43.818 68.7924C43.9345 70.124 44.107 71.1996 44.3397 72.0501C44.5602 72.8558 44.891 73.6757 45.4664 74.2887C46.1626 75.0303 47.1547 75.3844 48.1855 75.136C49.0033 74.9389 49.5779 74.4215 49.8919 74.0916C50.5484 73.4017 51.0124 72.5106 51.1945 72.0512C52.2528 69.3812 55.5273 63.1808 59.9602 59.6811C61.2536 58.6599 62.1959 58.3652 62.7889 58.3204C63.3477 58.2783 63.7531 58.4436 64.0716 58.6967C64.4225 58.9756 64.6844 59.3811 64.8146 59.7643C64.8606 59.8999 64.8802 59.9968 64.8884 60.0584C63.6866 62.0865 58.9205 69.5222 56.6729 77.069C54.9978 82.6941 50.9587 88.4259 47.9431 90.8809C45.0229 93.258 39.7748 94.7313 33.8625 95.0218C28.0069 95.3095 21.9748 94.4121 17.7298 92.5092C9.52994 88.8334 7.85968 80.7382 7.11135 77.2292C6.5306 74.5057 6.51956 71.5987 6.67502 68.9009C6.75257 67.5551 6.86815 66.2969 6.96907 65.1373C7.06713 64.0105 7.15666 62.9215 7.15667 62.0292ZM26.7768 27.0953C26.7768 25.8314 27.1148 24.7049 27.6737 23.9514C28.1793 23.27 28.9221 22.7987 30.1168 22.7984C31.0942 22.7982 31.7519 22.9187 32.2162 23.1167C32.6327 23.2943 32.9818 23.5699 33.2997 24.0831C34.0329 25.2671 34.5706 27.6455 34.5739 32.384L34.0554 43.6021C33.8615 47.3443 33.6592 51.3994 33.5263 54.7707L26.7768 55.6666V27.0953ZM22.6096 56.2652L16.5905 57.218L15.7705 43.267V32.5083C15.7705 31.031 16.3726 30.1275 17.0848 29.5489C17.8786 28.9039 18.8059 28.6731 19.2433 28.6731C20.0405 28.6731 20.8635 28.797 21.4565 29.2179C21.9131 29.5421 22.6095 30.3087 22.6096 32.5083V56.2652ZM11.6032 35.4278C10.3568 34.8069 9.02271 34.6083 7.85016 34.6868C5.72547 34.8292 3.85203 35.718 2.7259 37.6779C1.70253 39.4592 1.4893 41.8136 1.7215 44.4927C2.04237 48.1949 2.99044 58.6457 2.99044 62.0292C2.99043 62.708 2.91997 63.6116 2.81865 64.7758C2.7202 65.907 2.59705 67.2389 2.51511 68.6606C2.35156 71.4987 2.34047 74.8383 3.03576 78.0987C3.76011 81.4953 5.7216 91.6918 16.0245 96.3108C21.0312 98.5551 27.7601 99.4936 34.0669 99.1838C40.3173 98.8767 46.6346 97.3189 50.5738 94.1122C54.2816 91.0936 58.7687 84.6307 60.6663 78.2589C62.8096 71.0619 67.4516 63.9646 68.6099 61.9533C69.292 60.7689 69.0785 59.3628 68.7606 58.4258C68.4018 57.3688 67.7071 56.2631 66.6632 55.4337C65.5867 54.5784 64.1582 54.0377 62.4749 54.1647C60.8256 54.2893 59.1163 55.0393 57.3791 56.4107C52.9084 59.9401 49.6283 65.5082 48.0201 68.9231C48.0035 68.7664 47.9835 68.6024 47.9684 68.4298C47.7597 66.0435 47.7233 62.3344 48.0159 56.7132C48.199 53.1942 48.5269 50.1809 48.8738 46.6828C49.22 43.1904 49.5785 39.2713 49.8076 34.0302C49.9903 29.8481 49.5613 26.6722 48.3953 24.471C47.7909 23.3302 46.9729 22.4223 45.9322 21.814C44.8964 21.2087 43.7676 20.974 42.6523 20.974C41.0038 20.974 38.9498 21.2062 37.3141 22.7678C37.1699 22.4576 37.0125 22.1652 36.842 21.8899C36.0864 20.6698 35.0817 19.8084 33.8509 19.2835C32.668 18.7791 31.3849 18.6309 30.1168 18.6311C27.5676 18.6315 25.5976 19.7565 24.3275 21.4683C23.5057 22.576 23.0121 23.8776 22.7771 25.1982C21.4248 24.5876 20.0718 24.5068 19.2433 24.5068C17.8299 24.5068 15.9789 25.0791 14.4573 26.3154C12.8543 27.6179 11.6033 29.6733 11.6032 32.5083V35.4278Z" fill="#8B5CF6"/>
                             </svg>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="chat-messages" id="chatMessages">
-                    <div class="empty-state" id="emptyState">
-                        <div class="empty-icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-                            </svg>
-                        </div>
-                        <div class="empty-title">HANDS & HEAD</div>
-                        <div class="empty-text">Olá! Sou seu assistente de IA. Como posso ajudar você hoje?</div>
-                    </div>
-                </div>
-
-                <div class="input-area">
-                    <div class="input-container">
-                        <textarea class="chat-input" id="chatInput" placeholder="Digite sua mensagem..." rows="1"></textarea>
-                        <button class="send-btn" id="sendBtn" onclick="sendMessage()">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <line x1="22" y1="2" x2="11" y2="13"></line>
-                                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-            </main>
-
-            <!-- RIGHT PANEL -->
-            <aside class="right-panel" id="rightPanel">
-                <div class="panel-tabs">
-                    <div class="panel-tab active" data-panel="actions">Ações</div>
-                    <div class="panel-tab" data-panel="terminal">Terminal</div>
-                    <div class="panel-tab" data-panel="files">Arquivos</div>
-                </div>
-                <div class="panel-content">
-                    <div id="actionsPanel">
-                        <div class="actions-list" id="actionsList">
-                            <div style="color: var(--text-muted); font-size: 12px; text-align: center; padding: 20px;">Nenhuma ação executada ainda</div>
-                        </div>
-                    </div>
-                    <div id="terminalPanel" style="display: none;">
-                        <div class="terminal-output" id="terminalOutput">
-                            <div class="terminal-line">$ HANDS & HEAD Terminal</div>
-                            <div class="terminal-line">$ Digite um comando...</div>
-                        </div>
-                        <div class="terminal-input">
-                            <span class="terminal-prompt">$</span>
-                            <input type="text" class="terminal-cmd" id="terminalCmd" placeholder="Comando..." onkeypress="handleTerminal(event)">
+                            <h1 class="welcome-title">HANDS & HEAD</h1>
+                            <p class="welcome-subtitle">Assistente de IA que pode interagir com seu computador para executar tarefas. Inspirado no OpenHands.</p>
+                            
+                            <div class="welcome-tasks">
+                                <div class="task-card">
+                                    <div class="task-icon">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+                                            <polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>
+                                        </svg>
+                                    </div>
+                                    <div class="task-content">
+                                        <div class="task-title">Escrever código</div>
+                                        <div class="task-desc">Crie e edite arquivos no seu projeto</div>
+                                    </div>
+                                </div>
+                                <div class="task-card">
+                                    <div class="task-icon">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+                                            <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/>
+                                            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                                        </svg>
+                                    </div>
+                                    <div class="task-content">
+                                        <div class="task-title">Navegar na web</div>
+                                        <div class="task-desc">Pesquise informações e colete dados</div>
+                                    </div>
+                                </div>
+                                <div class="task-card">
+                                    <div class="task-icon">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+                                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                                        </svg>
+                                    </div>
+                                    <div class="task-content">
+                                        <div class="task-title">Analisar e explicar</div>
+                                        <div class="task-desc">Revise código e documentação</div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div id="filesPanel" style="display: none;">
-                        <div class="file-tree" id="fileTree">
-                            <div class="tree-item folder">
-                                <svg class="tree-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
-                                </svg>
-                                <span>workspace</span>
+                    
+                    <div class="input-area">
+                        <div class="input-container">
+                            <textarea class="chat-input" id="chatInput" rows="1" placeholder="O que você gostaria que eu fizesse?"></textarea>
+                            <div class="input-actions">
+                                <button class="input-btn" title="Attach File">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+                                        <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
+                                    </svg>
+                                </button>
+                                <button class="input-btn send-btn" onclick="sendMessage()">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+                                        <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                                    </svg>
+                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
-            </aside>
-        </div>
+                
+                <aside class="right-panel" id="rightPanel" style="display: none;">
+                    <div class="panel-tabs">
+                        <button class="panel-tab active" data-panel="terminal" onclick="switchPanel('terminal')">Terminal</button>
+                        <button class="panel-tab" data-panel="files" onclick="switchPanel('files')">Files</button>
+                        <button class="panel-tab" data-panel="actions" onclick="switchPanel('actions')">Actions</button>
+                    </div>
+                    
+                    <div class="panel-content active" id="terminalPanel">
+                        <div class="terminal-container">
+                            <div class="terminal-output" id="terminalOutput">
+                                <div class="terminal-line">HANDS & HEAD Terminal</div>
+                                <div class="terminal-line">Pronto para executar comandos...</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="panel-content" id="filesPanel">
+                        <div class="files-container">
+                            <div class="file-tree">
+                                <div class="file-item folder">
+                                    <svg class="file-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+                                    </svg>
+                                    <span>workspace</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="panel-content" id="actionsPanel">
+                        <div class="files-container" id="actionsList">
+                            <div style="color: var(--text-muted); font-size: 12px; text-align: center; padding: 20px;">
+                                Nenhuma ação executada ainda
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </main>
     </div>
-
-    <!-- SETTINGS MODAL -->
+    
+    <!-- Settings Modal -->
     <div class="modal-overlay" id="settingsModal">
         <div class="modal">
             <div class="modal-header">
-                <div class="modal-title">Configurações</div>
-                <button class="modal-close" onclick="closeSettings()">×</button>
+                <h2 class="modal-title">Configurações</h2>
+                <button class="modal-close" onclick="closeSettings()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+                        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </button>
             </div>
             <div class="modal-body">
                 <div class="form-group">
-                    <label class="form-label">API Key do LLM</label>
-                    <input type="password" class="form-input" id="apiKeyInput" placeholder="Cole sua API key...">
+                    <label class="form-label">API Key</label>
+                    <input type="password" class="form-input" id="apiKeyInput" placeholder="Cole sua API key aqui...">
                 </div>
                 <div class="form-group">
                     <label class="form-label">Modelo</label>
@@ -708,176 +724,94 @@
                         <option value="claude-3.5-sonnet">Claude 3.5 Sonnet</option>
                     </select>
                 </div>
-                <button class="btn btn-primary" style="width: 100%;" onclick="saveSettings()">Salvar</button>
+                <button class="form-btn" onclick="saveSettings()">Salvar Configurações</button>
             </div>
         </div>
     </div>
-
-    <!-- TOAST -->
+    
     <div class="toast-container" id="toastContainer"></div>
-
+    
     <script>
-        let ws = null, connected = false, actions = [];
-
-        document.addEventListener('DOMContentLoaded', () => {
-            initWebSocket();
-            initChatInput();
-            initNavItems();
-            initPanelTabs();
+        const chatInput = document.getElementById('chatInput');
+        const chatMessages = document.getElementById('chatMessages');
+        const welcomeScreen = document.getElementById('welcomeScreen');
+        const rightPanel = document.getElementById('rightPanel');
+        
+        chatInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 120) + 'px';
         });
-
-        function initWebSocket() {
-            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-            ws = new WebSocket(`${protocol}//${window.location.host}/ws`);
-            ws.onopen = () => { connected = true; updateStatus(true); };
-            ws.onclose = () => { connected = false; updateStatus(false); setTimeout(initWebSocket, 3000); };
-            ws.onerror = () => updateStatus(false);
-            ws.onmessage = (e) => handleMessage(JSON.parse(e.data));
-        }
-
-        function updateStatus(isConnected) {
-            document.getElementById('statusDot').classList.toggle('offline', !isConnected);
-            document.getElementById('statusText').textContent = isConnected ? 'Conectado' : 'Desconectado';
-        }
-
-        function handleMessage(data) {
-            switch(data.type) {
-                case 'connected': showToast('Conectado ao HANDS & HEAD', 'success'); break;
-                case 'thinking': showTyping(true); break;
-                case 'response': showTyping(false); addMessage('assistant', data.content); document.getElementById('emptyState').style.display = 'none'; break;
-                case 'actions': updateActions(data.actions); break;
-                case 'complete': showTyping(false); break;
-                case 'error': showTyping(false); showToast(data.content, 'error'); break;
-            }
-        }
-
-        function initChatInput() {
-            const input = document.getElementById('chatInput');
-            input.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } });
-            input.addEventListener('input', () => { input.style.height = 'auto'; input.style.height = Math.min(input.scrollHeight, 120) + 'px'; });
-        }
-
+        
+        chatInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+        });
+        
         function sendMessage() {
-            const input = document.getElementById('chatInput'), message = input.value.trim();
-            if (!message || !connected) return;
-            addMessage('user', message);
-            input.value = '';
-            input.style.height = 'auto';
-            document.getElementById('emptyState').style.display = 'none';
-            ws.send(JSON.stringify({ type: 'message', content: message }));
-        }
-
-        function addMessage(role, content) {
-            const container = document.getElementById('chatMessages');
-            const time = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-            const avatarSvg = role === 'assistant' 
-                ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>'
-                : '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
+            const message = chatInput.value.trim();
+            if (!message) return;
             
-            const msg = document.createElement('div');
-            msg.className = `message ${role}`;
-            msg.innerHTML = `<div class="message-avatar">${avatarSvg}</div><div class="message-content"><div class="message-text">${escapeHtml(content)}</div><div class="message-time">${time}</div></div>`;
-            container.appendChild(msg);
-            container.scrollTop = container.scrollHeight;
+            welcomeScreen.style.display = 'none';
+            addMessage('user', message);
+            chatInput.value = '';
+            chatInput.style.height = 'auto';
+            showTyping(true);
+            
+            setTimeout(() => {
+                showTyping(false);
+                addMessage('assistant', 'Entendi! Estou processando sua solicitação. Como posso ajudar você com isso?');
+            }, 1500);
         }
-
+        
+        function addMessage(role, content) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${role}`;
+            
+            const avatarSvg = role === 'assistant' 
+                ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>'
+                : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
+            
+            messageDiv.innerHTML = `
+                <div class="message-avatar">${avatarSvg}</div>
+                <div class="message-content">
+                    <div class="message-bubble"><div class="message-text">${escapeHtml(content)}</div></div>
+                </div>`;
+            
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
         function showTyping(show) {
-            const container = document.getElementById('chatMessages');
             let typing = document.getElementById('typingIndicator');
             if (show) {
                 if (!typing) {
                     typing = document.createElement('div');
                     typing.id = 'typingIndicator';
                     typing.className = 'message assistant';
-                    typing.innerHTML = `<div class="message-avatar"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg></div><div class="message-content"><div class="typing visible"><div class="typing-dots"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div></div></div>`;
-                    container.appendChild(typing);
+                    typing.innerHTML = `<div class="message-avatar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><circle cx="12" cy="12" r="10"/></svg></div><div class="message-content"><div class="message-bubble"><div class="typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div></div></div>`;
+                    chatMessages.appendChild(typing);
                 }
             } else if (typing) { typing.remove(); }
-            container.scrollTop = container.scrollHeight;
+            chatMessages.scrollTop = chatMessages.scrollHeight;
         }
-
-        function clearChat() {
-            document.getElementById('chatMessages').innerHTML = `<div class="empty-state" id="emptyState"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></div><div class="empty-title">HANDS & HEAD</div><div class="empty-text">Olá! Sou seu assistente de IA. Como posso ajudar você hoje?</div></div>`;
-            actions = [];
-            updateActionsPanel();
+        
+        function switchPanel(panelName) {
+            document.querySelectorAll('.panel-tab').forEach(tab => { tab.classList.remove('active'); if (tab.dataset.panel === panelName) tab.classList.add('active'); });
+            document.querySelectorAll('.panel-content').forEach(content => content.classList.remove('active'));
+            document.getElementById(`${panelName}Panel`).classList.add('active');
         }
-
-        function updateActions(newActions) { actions = [...actions, ...newActions]; updateActionsPanel(); }
-
-        function updateActionsPanel() {
-            const list = document.getElementById('actionsList');
-            list.innerHTML = actions.length === 0 
-                ? '<div style="color: var(--text-muted); font-size: 12px; text-align: center; padding: 20px;">Nenhuma ação executada ainda</div>'
-                : actions.map(a => `<div class="action-item"><span class="action-tool">${a.tool}</span><span class="action-content">${escapeHtml(a.observation || '')}</span></div>`).join('');
-        }
-
-        function initNavItems() {
-            document.querySelectorAll('.nav-item').forEach(item => {
-                item.addEventListener('click', () => {
-                    document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-                    item.classList.add('active');
-                    const view = item.dataset.view;
-                    if (view === 'terminal') { document.getElementById('rightPanel').style.display = 'flex'; document.querySelector('.panel-tab[data-panel="terminal"]').click(); }
-                    else if (view === 'files') { document.getElementById('rightPanel').style.display = 'flex'; document.querySelector('.panel-tab[data-panel="files"]').click(); }
-                });
-            });
-        }
-
-        function initPanelTabs() {
-            document.querySelectorAll('.panel-tab').forEach(tab => {
-                tab.addEventListener('click', () => {
-                    document.querySelectorAll('.panel-tab').forEach(t => t.classList.remove('active'));
-                    tab.classList.add('active');
-                    document.querySelectorAll('.panel-view, #actionsPanel, #terminalPanel, #filesPanel').forEach(p => p.style.display = 'none');
-                    document.getElementById(`${tab.dataset.panel}Panel`).style.display = 'block';
-                });
-            });
-        }
-
-        function toggleTerminal() {
-            const panel = document.getElementById('rightPanel');
-            if (panel.style.display === 'none' || !panel.style.display) {
-                panel.style.display = 'flex';
-                document.querySelector('.panel-tab[data-panel="terminal"]').click();
-            } else { panel.style.display = 'none'; }
-        }
-
-        function toggleFiles() {
-            const panel = document.getElementById('rightPanel');
-            if (panel.style.display === 'none' || !panel.style.display) {
-                panel.style.display = 'flex';
-                document.querySelector('.panel-tab[data-panel="files"]').click();
-            } else { panel.style.display = 'none'; }
-        }
-
-        function handleTerminal(e) {
-            if (e.key === 'Enter') {
-                const cmd = e.target.value.trim();
-                if (cmd) { addTerminalLine('$' + cmd); e.target.value = ''; }
-            }
-        }
-
-        function addTerminalLine(text) {
-            const output = document.getElementById('terminalOutput');
-            const line = document.createElement('div');
-            line.className = 'terminal-line';
-            line.textContent = text;
-            output.appendChild(line);
-            output.scrollTop = output.scrollHeight;
-        }
-
+        
         function openSettings() { document.getElementById('settingsModal').classList.add('visible'); }
         function closeSettings() { document.getElementById('settingsModal').classList.remove('visible'); }
-
+        
         function saveSettings() {
             localStorage.setItem('hands_head_api_key', document.getElementById('apiKeyInput').value);
             localStorage.setItem('hands_head_model', document.getElementById('modelSelect').value);
-            showToast('Configurações salvas', 'success');
+            showToast('Configurações salvas!', 'success');
             closeSettings();
         }
-
+        
         function escapeHtml(text) { const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
-
+        
         function showToast(message, type = 'info') {
             const container = document.getElementById('toastContainer');
             const toast = document.createElement('div');
@@ -886,6 +820,13 @@
             container.appendChild(toast);
             setTimeout(() => toast.remove(), 3000);
         }
+        
+        window.onload = function() {
+            const savedApiKey = localStorage.getItem('hands_head_api_key');
+            const savedModel = localStorage.getItem('hands_head_model');
+            if (savedApiKey) document.getElementById('apiKeyInput').value = savedApiKey;
+            if (savedModel) document.getElementById('modelSelect').value = savedModel;
+        };
     </script>
 </body>
 </html>
