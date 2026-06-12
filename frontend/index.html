@@ -40,9 +40,83 @@
             color: var(--text-primary);
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
+            overflow: hidden;
         }
         
-        .app-container { display: flex; height: 100vh; overflow: hidden; }
+        /* Animated SVG Background */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.4;
+        }
+        
+        .bg-animation svg {
+            width: 100%;
+            height: 100%;
+        }
+        
+        /* Floating particles */
+        .particle {
+            animation: float 20s ease-in-out infinite;
+        }
+        
+        .particle:nth-child(1) { animation-delay: 0s; animation-duration: 25s; }
+        .particle:nth-child(2) { animation-delay: -5s; animation-duration: 20s; }
+        .particle:nth-child(3) { animation-delay: -10s; animation-duration: 30s; }
+        .particle:nth-child(4) { animation-delay: -15s; animation-duration: 22s; }
+        .particle:nth-child(5) { animation-delay: -3s; animation-duration: 28s; }
+        .particle:nth-child(6) { animation-delay: -8s; animation-duration: 24s; }
+        .particle:nth-child(7) { animation-delay: -12s; animation-duration: 26s; }
+        .particle:nth-child(8) { animation-delay: -7s; animation-duration: 21s; }
+        
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); opacity: 0.3; }
+            25% { transform: translate(30px, -40px) rotate(90deg); opacity: 0.6; }
+            50% { transform: translate(-20px, -80px) rotate(180deg); opacity: 0.4; }
+            75% { transform: translate(40px, -40px) rotate(270deg); opacity: 0.7; }
+        }
+        
+        /* Pulsing rings */
+        .ring {
+            transform-origin: center;
+        }
+        
+        .ring-1 { animation: pulse 8s ease-in-out infinite; }
+        .ring-2 { animation: pulse 8s ease-in-out infinite 2s; }
+        .ring-3 { animation: pulse 8s ease-in-out infinite 4s; }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.1; }
+            50% { transform: scale(1.1); opacity: 0.3; }
+        }
+        
+        /* Gradient mesh animation */
+        .gradient-mesh {
+            animation: meshMove 30s ease-in-out infinite;
+        }
+        
+        @keyframes meshMove {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(20px, 10px) scale(1.05); }
+            66% { transform: translate(-10px, 20px) scale(0.95); }
+        }
+        
+        /* Glow effect */
+        .glow {
+            animation: glow 4s ease-in-out infinite alternate;
+        }
+        
+        @keyframes glow {
+            0% { opacity: 0.2; }
+            100% { opacity: 0.5; }
+        }
+        
+        .app-container { display: flex; height: 100vh; overflow: hidden; position: relative; z-index: 1; }
         
         .sidebar {
             width: 75px;
@@ -520,6 +594,131 @@
     </style>
 </head>
 <body>
+    <!-- Animated SVG Background -->
+    <div class="bg-animation">
+        <svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <!-- Gradient for background mesh -->
+                <linearGradient id="meshGradient1" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#8B5CF6" stop-opacity="0.15"/>
+                    <stop offset="50%" stop-color="#06B6D4" stop-opacity="0.1"/>
+                    <stop offset="100%" stop-color="#8B5CF6" stop-opacity="0.15"/>
+                </linearGradient>
+                
+                <linearGradient id="meshGradient2" x1="100%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stop-color="#06B6D4" stop-opacity="0.12"/>
+                    <stop offset="50%" stop-color="#8B5CF6" stop-opacity="0.08"/>
+                    <stop offset="100%" stop-color="#06B6D4" stop-opacity="0.12"/>
+                </linearGradient>
+                
+                <!-- Glow filter -->
+                <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+                    <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                    <feMerge>
+                        <feMergeNode in="coloredBlur"/>
+                        <feMergeNode in="SourceGraphic"/>
+                    </feMerge>
+                </filter>
+                
+                <!-- Radial glow -->
+                <radialGradient id="radialGlow" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%" stop-color="#8B5CF6" stop-opacity="0.3"/>
+                    <stop offset="100%" stop-color="#8B5CF6" stop-opacity="0"/>
+                </radialGradient>
+            </defs>
+            
+            <!-- Background gradient mesh -->
+            <g class="gradient-mesh">
+                <rect width="1920" height="1080" fill="url(#meshGradient1)" opacity="0.5"/>
+                <rect x="200" y="100" width="800" height="600" fill="url(#meshGradient2)" opacity="0.3" rx="100"/>
+                <rect x="900" y="400" width="700" height="500" fill="url(#meshGradient1)" opacity="0.25" rx="80"/>
+                <rect x="100" y="600" width="600" height="400" fill="url(#meshGradient2)" opacity="0.2" rx="60"/>
+                <rect x="1200" y="100" width="500" height="350" fill="url(#meshGradient1)" opacity="0.2" rx="50"/>
+            </g>
+            
+            <!-- Pulsing rings (center and corners) -->
+            <g class="ring ring-1" opacity="0.15">
+                <circle cx="960" cy="540" r="400" fill="none" stroke="#8B5CF6" stroke-width="1"/>
+                <circle cx="960" cy="540" r="300" fill="none" stroke="#06B6D4" stroke-width="0.5"/>
+                <circle cx="960" cy="540" r="200" fill="none" stroke="#8B5CF6" stroke-width="0.5"/>
+            </g>
+            
+            <g class="ring ring-2" opacity="0.1">
+                <circle cx="200" cy="200" r="250" fill="none" stroke="#06B6D4" stroke-width="1"/>
+                <circle cx="200" cy="200" r="150" fill="none" stroke="#8B5CF6" stroke-width="0.5"/>
+            </g>
+            
+            <g class="ring ring-3" opacity="0.12">
+                <circle cx="1700" cy="900" r="300" fill="none" stroke="#8B5CF6" stroke-width="1"/>
+                <circle cx="1700" cy="900" r="200" fill="none" stroke="#06B6D4" stroke-width="0.5"/>
+            </g>
+            
+            <!-- Floating particles - Geometric shapes -->
+            <g class="particle">
+                <polygon points="100,50 115,75 85,75" fill="#8B5CF6" opacity="0.4"/>
+            </g>
+            <g class="particle">
+                <rect x="400" y="150" width="20" height="20" fill="#06B6D4" opacity="0.35" transform="rotate(45 410 160)"/>
+            </g>
+            <g class="particle">
+                <circle cx="700" cy="300" r="12" fill="#8B5CF6" opacity="0.3"/>
+            </g>
+            <g class="particle">
+                <polygon points="900,100 920,130 880,130" fill="#06B6D4" opacity="0.45"/>
+            </g>
+            <g class="particle">
+                <rect x="1200" y="200" width="15" height="15" fill="#8B5CF6" opacity="0.3" transform="rotate(30 1207 207)"/>
+            </g>
+            <g class="particle">
+                <circle cx="1500" cy="150" r="8" fill="#06B6D4" opacity="0.4"/>
+            </g>
+            <g class="particle">
+                <polygon points="1800,300 1815,325 1785,325" fill="#8B5CF6" opacity="0.35"/>
+            </g>
+            <g class="particle">
+                <rect x="200" y="700" width="18" height="18" fill="#06B6D4" opacity="0.3" transform="rotate(60 209 709)"/>
+            </g>
+            <g class="particle">
+                <circle cx="600" cy="800" r="10" fill="#8B5CF6" opacity="0.4"/>
+            </g>
+            <g class="particle">
+                <polygon points="1100,700 1120,730 1080,730" fill="#06B6D4" opacity="0.35"/>
+            </g>
+            <g class="particle">
+                <circle cx="1600" cy="850" r="14" fill="#8B5CF6" opacity="0.3"/>
+            </g>
+            <g class="particle">
+                <rect x="1400" y="600" width="16" height="16" fill="#06B6D4" opacity="0.4" transform="rotate(45 1408 608)"/>
+            </g>
+            
+            <!-- Glowing nodes -->
+            <g class="glow">
+                <circle cx="300" cy="400" r="5" fill="#8B5CF6" filter="url(#glow)"/>
+                <circle cx="800" cy="200" r="4" fill="#06B6D4" filter="url(#glow)"/>
+                <circle cx="1400" cy="350" r="5" fill="#8B5CF6" filter="url(#glow)"/>
+                <circle cx="1700" cy="600" r="4" fill="#06B6D4" filter="url(#glow)"/>
+                <circle cx="500" cy="700" r="4" fill="#8B5CF6" filter="url(#glow)"/>
+                <circle cx="1100" cy="500" r="5" fill="#06B6D4" filter="url(#glow)"/>
+            </g>
+            
+            <!-- Connection lines (subtle) -->
+            <g opacity="0.1" stroke="#8B5CF6" stroke-width="0.5">
+                <line x1="300" y1="400" x2="800" y2="200"/>
+                <line x1="800" y1="200" x2="1400" y2="350"/>
+                <line x1="1400" y1="350" x2="1700" y2="600"/>
+                <line x1="1700" y1="600" x2="1100" y2="500"/>
+                <line x1="1100" y1="500" x2="500" y2="700"/>
+                <line x1="500" y1="700" x2="300" y2="400"/>
+            </g>
+            
+            <!-- Additional decorative elements -->
+            <g opacity="0.08">
+                <path d="M0,200 Q400,100 800,300 T1600,200 T1920,400 L1920,0 L0,0 Z" fill="#8B5CF6"/>
+                <path d="M0,800 Q500,900 1000,750 T1600,850 T1920,700 L1920,1080 L0,1080 Z" fill="#06B6D4"/>
+            </g>
+        </svg>
+    </div>
+    
     <div class="app-container">
         <!-- Sidebar -->
         <aside class="sidebar">
