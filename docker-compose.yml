@@ -1,0 +1,89 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: hands_head_db
+    environment:
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-password}
+      POSTGRES_DB: ${DB_NAME:-hands_head}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - hands_head_network
+
+  redis:
+    image: redis:7-alpine
+    container_name: hands_head_cache
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - hands_head_network
+
+  api:
+    build: .
+    container_name: hands_head_api
+    environment:
+      - PORT=12000
+      - HOST=0.0.0.0
+      - DEBUG=${DEBUG:-false}
+      - DATABASE_URL=postgresql://${DB_USER:-postgres}:${DB_PASSWORD:-password}@db:5432/${DB_NAME:-hands_head}
+      - REDIS_URL=redis://redis:6379
+      - LLM_MODEL=${LLM_MODEL:-litellm_proxy/minimax-m2.7}
+      - LLM_API_KEY=${LLM_API_KEY}
+      - LLM_BASE_URL=${LLM_BASE_URL:-https://llm-proxy.app.all-hands.dev}
+      - JWT_SECRET=${JWT_SECRET:-your-secret-key-change-in-production}
+      - CORS_ORIGINS=${CORS_ORIGINS:-http://localhost:3000,http://localhost:12000}
+    ports:
+      - "12000:12000"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app/backend
+      - ./frontend:/app/frontend
+    networks:
+      - hands_head_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:12000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  nginx:
+    image: nginx:alpine
+    container_name: hands_head_nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./frontend:/usr/share/nginx/html:ro
+    depends_on:
+      - api
+    networks:
+      - hands_head_network
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  hands_head_network:
+    driver: bridge
