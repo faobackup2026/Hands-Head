@@ -1,129 +1,179 @@
 """
 HANDS & HEAD by Fao Labs
-Cliente LLM usando LiteLLM
+Cliente LiteLLM para integração com múltiplos provedores de LLM
 """
 import os
-import json
-from typing import Dict, List, Optional, Iterator
-from litellm import acompletion, completion
+import logging
+from typing import Dict, List, Optional, Any
+from datetime import datetime
+
+try:
+    import litellm
+except ImportError:
+    raise ImportError("litellm não está instalado. Execute: pip install litellm")
+
+logger = logging.getLogger(__name__)
 
 
 class LLMClient:
-    """Cliente para integração com LLM via LiteLLM"""
+    """
+    Cliente para integração com LiteLLM Proxy
+    Suporta: OpenAI, Anthropic, MiniMax, e outros via LiteLLM
+    """
     
-    def __init__(self, model: str = None, api_key: str = None, base_url: str = None):
+    def __init__(self, 
+                 model: Optional[str] = None,
+                 api_key: Optional[str] = None,
+                 base_url: Optional[str] = None,
+                 max_retries: int = 3,
+                 timeout: int = 300):
+        """
+        Inicializa o cliente LLM
+        
+        Args:
+            model: Nome do modelo (ex: "litellm_proxy/minimax-m2.7")
+            api_key: Chave da API (lê de LLM_API_KEY se não fornecida)
+            base_url: URL base do proxy LLM
+            max_retries: Número máximo de tentativas
+            timeout: Timeout em segundos
+        """
         self.model = model or os.getenv("LLM_MODEL", "litellm_proxy/minimax-m2.7")
         self.api_key = api_key or os.getenv("LLM_API_KEY", "")
         self.base_url = base_url or os.getenv("LLM_BASE_URL", "https://llm-proxy.app.all-hands.dev")
-        self.timeout = 300
+        self.max_retries = max_retries
+        self.timeout = timeout
         
-        # Configurar ambiente
+        # Configurar LiteLLM
+        if self.base_url:
+            litellm.api_base = self.base_url
+        
         if self.api_key:
-            os.environ["LLM_API_KEY"] = self.api_key
-        os.environ["LLM_BASE_URL"] = self.base_url
+            litellm.api_key = self.api_key
+        else:
+            logger.warning("⚠️ LLM_API_KEY não configurada. O LLM pode não funcionar corretamente.")
+        
+        # Configurações adicionais
+        litellm.request_timeout = self.timeout
+        litellm.num_retries = self.max_retries
+        
+        logger.info(f"✅ LLMClient inicializado com modelo: {self.model}")
+        logger.debug(f"   Base URL: {self.base_url}")
     
-    def get_system_prompt(self) -> str:
-        """Retorna o system prompt do agente"""
-        return """You are HANDS & HEAD, an AI agent by Fao Labs that can interact with a computer to solve tasks.
-
-<ROLE>
-* Your primary role is to assist users by executing commands, modifying code, and solving technical problems effectively.
-* You should be thorough, methodical, and prioritize quality over speed.
-* If the user asks a question, like "why is X happening", don't try to fix the problem. Just give an answer to the question.
-</ROLE>
-
-<CAPABILITIES>
-You have access to the following tools:
-
-1. **terminal** - Execute shell commands on the system
-   - Use for: running programs, navigating filesystem, git operations
-   
-2. **file_editor** - Read, write, and edit files
-   - Use for: creating files, modifying code, viewing content
-   
-3. **git** - Execute git commands
-   - Use for: version control, commits, branches
-   
-4. **browser** - Navigate and interact with web pages
-   - Use for: searching the web, filling forms, clicking elements
-   
-5. **think** - Think and reason about a problem
-   - Use for: planning, analysis, internal reasoning
-
-When using tools, always respond with the proper tool call format.
-After each tool execution, observe the result and decide the next step.
-"""
-    
-    async def chat(self, messages: List[Dict], stream: bool = False) -> Dict:
-        """Envia mensagem para o LLM e retorna resposta"""
+    def chat_sync(self, 
+                  messages: List[Dict[str, str]],
+                  temperature: float = 0.7,
+                  max_tokens: Optional[int] = None,
+                  system_prompt: Optional[str] = None) -> Dict[str, Any]:
+        """
+        Chat síncrono com o LLM
+        
+        Args:
+            messages: Lista de mensagens no formato OpenAI
+                     [{"role": "user", "content": "..."}, ...]
+            temperature: Temperatura de criatividade (0.0-1.0)
+            max_tokens: Número máximo de tokens na resposta
+            system_prompt: Prompt de sistema personalizado
+            
+        Returns:
+            Dicionário com resposta:
+            {
+                "content": "resposta do assistente",
+                "usage": {...},
+                "model": "...",
+                "created": timestamp,
+                "error": None
+            }
+        """
         try:
-            # Preparar mensagens
-            formatted_messages = []
+            # Adiciona system prompt se fornecido
+            if system_prompt:
+                system_msg = {"role": "system", "content": system_prompt}
+                if messages and messages[0]["role"] != "system":
+                    messages = [system_msg] + messages
             
-            # Adicionar system prompt
-            formatted_messages.append({
-                "role": "system",
-                "content": self.get_system_prompt()
-            })
+            logger.debug(f"🤔 Chamando LLM com {len(messages)} mensagens")
             
-            # Adicionar histórico
-            for msg in messages:
-                formatted_messages.append({
-                    "role": msg.get("role", "user"),
-                    "content": msg.get("content", "")
-                })
-            
-            response = await acompletion(
+            # Chamada ao LLM via LiteLLM
+            response = litellm.completion(
                 model=self.model,
-                messages=formatted_messages,
-                stream=False,
-                timeout=self.timeout,
+                messages=messages,
+                temperature=temperature,
+                max_tokens=max_tokens,
+                api_key=self.api_key,
+                base_url=self.base_url
             )
             
-            return {
-                "content": response["choices"][0]["message"]["content"],
-                "model": self.model,
-                "usage": response.get("usage", {}),
-            }
+            # Extrai conteúdo da resposta
+            content = response.choices[0].message.content
             
-        except Exception as e:
+            logger.debug(f"✅ Resposta recebida ({len(content)} caracteres)")
+            
             return {
-                "error": str(e),
-                "content": f"Erro ao comunicar com LLM: {str(e)}"
+                "content": content,
+                "usage": {
+                    "prompt_tokens": response.usage.prompt_tokens if hasattr(response.usage, 'prompt_tokens') else 0,
+                    "completion_tokens": response.usage.completion_tokens if hasattr(response.usage, 'completion_tokens') else 0,
+                    "total_tokens": response.usage.total_tokens if hasattr(response.usage, 'total_tokens') else 0,
+                },
+                "model": self.model,
+                "created": datetime.now().isoformat(),
+                "error": None
+            }
+        
+        except Exception as e:
+            error_msg = str(e)
+            logger.error(f"❌ Erro ao chamar LLM: {error_msg}")
+            
+            return {
+                "content": "",
+                "usage": {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0},
+                "model": self.model,
+                "created": datetime.now().isoformat(),
+                "error": error_msg
             }
     
-    def chat_sync(self, messages: List[Dict], stream: bool = False) -> Dict:
-        """Versão síncrona do chat"""
-        try:
-            formatted_messages = [
-                {"role": "system", "content": self.get_system_prompt()}
-            ]
+    async def chat_async(self,
+                        messages: List[Dict[str, str]],
+                        temperature: float = 0.7,
+                        max_tokens: Optional[int] = None,
+                        system_prompt: Optional[str] = None) -> Dict[str, Any]:
+        """
+        Chat assíncrono com o LLM
+        
+        Args:
+            messages: Lista de mensagens
+            temperature: Temperatura
+            max_tokens: Máximo de tokens
+            system_prompt: Prompt de sistema
             
-            for msg in messages:
-                formatted_messages.append({
-                    "role": msg.get("role", "user"),
-                    "content": msg.get("content", "")
-                })
-            
-            response = completion(
-                model=self.model,
-                messages=formatted_messages,
-                stream=False,
-                timeout=self.timeout,
-            )
-            
-            return {
-                "content": response["choices"][0]["message"]["content"],
-                "model": self.model,
-                "usage": response.get("usage", {}),
-            }
-            
-        except Exception as e:
-            return {
-                "error": str(e),
-                "content": f"Erro ao comunicar com LLM: {str(e)}"
-            }
+        Returns:
+            Dicionário com resposta
+        """
+        # Por enquanto, usa implementação síncrona em thread
+        # No futuro, pode ser otimizado com aiohttp
+        import asyncio
+        loop = asyncio.get_event_loop()
+        return await loop.run_in_executor(
+            None,
+            self.chat_sync,
+            messages,
+            temperature,
+            max_tokens,
+            system_prompt
+        )
+    
+    def get_model_info(self) -> Dict[str, Any]:
+        """Retorna informações sobre o modelo configurado"""
+        return {
+            "model": self.model,
+            "base_url": self.base_url,
+            "has_api_key": bool(self.api_key),
+            "max_retries": self.max_retries,
+            "timeout": self.timeout
+        }
 
 
-# Instância global
+# Instância global singleton
 llm_client = LLMClient()
+
+__all__ = ["LLMClient", "llm_client"]

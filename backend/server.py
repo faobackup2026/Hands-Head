@@ -6,11 +6,13 @@ import os
 import sys
 import json
 import asyncio
-from datetime import datetime
+import logging
+from datetime import datetime, timedelta
 from typing import Dict, Set
 from contextlib import asynccontextmanager
+from collections import defaultdict
 
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -22,6 +24,13 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from backend.config import config
 from backend.agent import Agent
 from backend.llm.client import llm_client
+
+# Configurar logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 
 
 # Modelo de request
@@ -37,8 +46,38 @@ class ChatResponse(BaseModel):
     iterations: int = 0
 
 
+# Rate Limiter
+class RateLimiter:
+    """Rate limiter simples por IP"""
+    def __init__(self, requests: int = 100, window: int = 60):
+        self.requests = requests
+        self.window = window  # segundos
+        self.clients: Dict[str, list] = defaultdict(list)
+    
+    def is_allowed(self, client_id: str) -> bool:
+        """Verifica se cliente pode fazer requisição"""
+        now = datetime.now()
+        cutoff = now - timedelta(seconds=self.window)
+        
+        # Remove requisições antigas
+        self.clients[client_id] = [
+            req_time for req_time in self.clients[client_id]
+            if req_time > cutoff
+        ]
+        
+        if len(self.clients[client_id]) < self.requests:
+            self.clients[client_id].append(now)
+            return True
+        
+        return False
+
+
+rate_limiter = RateLimiter(requests=100, window=60)
+
+
 # Gerenciamento de conexões WebSocket
 class ConnectionManager:
+    """Gerencia conexões WebSocket ativas"""
     def __init__(self):
         self.active_connections: Set[WebSocket] = set()
         self.agents: Dict[WebSocket, Agent] = {}
@@ -47,18 +86,28 @@ class ConnectionManager:
         await websocket.accept()
         self.active_connections.add(websocket)
         self.agents[websocket] = Agent(llm_client)
+        logger.info(f"✅ Cliente conectado. Total: {len(self.active_connections)}")
     
     def disconnect(self, websocket: WebSocket):
         self.active_connections.discard(websocket)
         if websocket in self.agents:
             del self.agents[websocket]
+        logger.info(f"❌ Cliente desconectado. Total: {len(self.active_connections)}")
     
     async def send_message(self, websocket: WebSocket, message: dict):
-        await websocket.send_json(message)
+        """Envia mensagem para cliente específico"""
+        try:
+            await websocket.send_json(message)
+        except Exception as e:
+            logger.error(f"Erro ao enviar mensagem: {e}")
     
     async def broadcast(self, message: dict):
+        """Broadcast para todos os clientes"""
         for connection in self.active_connections:
-            await connection.send_json(message)
+            try:
+                await connection.send_json(message)
+            except Exception as e:
+                logger.error(f"Erro no broadcast: {e}")
 
 
 manager = ConnectionManager()
@@ -67,11 +116,20 @@ manager = ConnectionManager()
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Lifecycle manager"""
-    print("🚀 HANDS & HEAD by Fao Labs - Servidor iniciando...")
-    print(f"📁 Diretório de trabalho: {config.system.working_dir}")
-    print(f"🔧 Ferramentas: {', '.join([t.name for t in config.system.tools])}")
+    print("""\n
+╔═══════════════════════════════════════════════════════════╗
+║                                                           ║
+║     🤝 HANDS & HEAD by Fao Labs                          ║
+║                                                           ║
+║     Agente de IA para automação e execução de tarefas    ║
+║                                                           ║
+╚═══════════════════════════════════════════════════════════╝
+""")
+    logger.info(f"🚀 HANDS & HEAD - Servidor iniciando...")
+    logger.info(f"📁 Diretório de trabalho: {config.system.working_dir}")
+    logger.info(f"🔧 Ferramentas: {', '.join([t.name for t in config.system.tools])}")
     yield
-    print("👋 HANDS & HEAD - Servidor encerrando...")
+    logger.info(f"👋 HANDS & HEAD - Servidor encerrando...")
 
 
 # Criar app FastAPI
@@ -82,10 +140,11 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# CORS middleware
+# CORS middleware com configuração segura
+allow_origins = os.getenv("ALLOW_ORIGINS", "http://localhost:12000,http://localhost:3000").split(",")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=allow_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -93,6 +152,17 @@ app.add_middleware(
 
 
 # ============== ROTAS HTTP ==============
+
+@app.middleware("http")
+async def rate_limit_middleware(request: Request, call_next):
+    """Middleware para rate limiting"""
+    client_ip = request.client.host if request.client else "unknown"
+    
+    if not rate_limiter.is_allowed(client_ip):
+        return HTTPException(status_code=429, detail="Too many requests")
+    
+    return await call_next(request)
+
 
 @app.get("/", response_class=HTMLResponse)
 async def root():
@@ -122,6 +192,9 @@ async def get_config():
 async def chat(request: ChatRequest):
     """Endpoint HTTP para chat"""
     try:
+        if not request.message.strip():
+            raise HTTPException(status_code=400, detail="Mensagem vazia")
+        
         agent = Agent(llm_client)
         result = await agent.process_message(request.message)
         
@@ -130,7 +203,10 @@ async def chat(request: ChatRequest):
             actions=result["actions"],
             iterations=result["iterations"]
         )
+    except HTTPException:
+        raise
     except Exception as e:
+        logger.error(f"Erro no chat: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
@@ -141,7 +217,8 @@ async def health():
         "status": "healthy",
         "service": "HANDS & HEAD",
         "version": "1.0.0",
-        "timestamp": datetime.now().isoformat()
+        "timestamp": datetime.now().isoformat(),
+        "connected_clients": len(manager.active_connections)
     }
 
 
@@ -189,6 +266,13 @@ async def websocket_endpoint(websocket: WebSocket):
                 continue
             
             if msg_type == "message":
+                if not content.strip():
+                    await manager.send_message(websocket, {
+                        "type": "error",
+                        "content": "Mensagem vazia"
+                    })
+                    continue
+                
                 # Processa mensagem
                 await manager.send_message(websocket, {
                     "type": "thinking",
@@ -226,6 +310,7 @@ async def websocket_endpoint(websocket: WebSocket):
                     })
                     
                 except Exception as e:
+                    logger.error(f"Erro ao processar mensagem: {e}")
                     await manager.send_message(websocket, {
                         "type": "error",
                         "content": f"Erro ao processar: {str(e)}"
@@ -233,9 +318,8 @@ async def websocket_endpoint(websocket: WebSocket):
     
     except WebSocketDisconnect:
         manager.disconnect(websocket)
-        print(f"Cliente desconectado")
     except Exception as e:
-        print(f"Erro WebSocket: {e}")
+        logger.error(f"Erro WebSocket: {e}")
         manager.disconnect(websocket)
 
 
@@ -265,6 +349,7 @@ def main():
 ║                                                           ║
 ║     🌐 http://localhost:{port}                             ║
 ║     📡 WebSocket: ws://localhost:{port}/ws                 ║
+║     📖 API Docs: http://localhost:{port}/api/docs          ║
 ║                                                           ║
 ╚═══════════════════════════════════════════════════════════╝
     """)

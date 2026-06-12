@@ -4,9 +4,12 @@ Motor do Agente - Loop THINK → ACTION → OBSERVE
 """
 import json
 import re
+import logging
 from typing import Dict, List, Optional
 from .llm.client import LLMClient
 from .tools import tools_registry
+
+logger = logging.getLogger(__name__)
 
 
 class Agent:
@@ -41,6 +44,11 @@ class Agent:
         messages.append({"role": "user", "content": user_input})
         
         response = self.llm.chat_sync(messages)
+        
+        if response.get("error"):
+            logger.error(f"Erro ao pensar: {response['error']}")
+            return f"Erro: {response['error']}"
+        
         return response.get("content", "")
     
     def parse_tool_calls(self, text: str) -> List[Dict]:
@@ -67,7 +75,7 @@ class Agent:
         
         # Padrão JSON: {"tool": "name", "params": {...}}
         json_pattern = r'\{[^{}]*"tool"[^{}]*\}'
-        json_matches = re.findall(json_pattern, text, re.JSON)
+        json_matches = re.findall(json_pattern, text)
         for match in json_matches:
             try:
                 data = json.loads(match)
@@ -76,7 +84,7 @@ class Agent:
                         "tool": data["tool"],
                         "params": data.get("params", {})
                     })
-            except:
+            except json.JSONDecodeError:
                 pass
         
         return tool_calls
@@ -152,8 +160,10 @@ class Agent:
             self.current_iteration += 1
             
             # THINK: Analisa e decide
-            think_result = self.think(user_input if self.current_iteration == 1 else 
-                                      f"Continue a tarefa. Último resultado: {actions[-1] if actions else 'N/A'}")
+            think_result = self.think(
+                user_input if self.current_iteration == 1 
+                else f"Continue a tarefa. Último resultado: {actions[-1].get('observation', 'N/A') if actions else 'N/A'}"
+            )
             
             thoughts.append(think_result)
             

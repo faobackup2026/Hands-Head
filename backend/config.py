@@ -3,8 +3,11 @@ HANDS & HEAD by Fao Labs
 Configurações do sistema
 """
 import os
-from typing import Dict, List, Optional
+import logging
+from typing import Dict, List, Optional, Any
 from pydantic import BaseModel
+
+logger = logging.getLogger(__name__)
 
 
 class LLMConfig(BaseModel):
@@ -53,7 +56,25 @@ class Config:
     def __init__(self):
         self.system = SystemConfig()
         self.conversations: Dict[str, List[Dict]] = {}
-        self.active_connections: Dict[str, any] = {}
+        self.active_connections: Dict[str, Any] = {}
+        self._validate_config()
+    
+    def _validate_config(self) -> None:
+        """Valida a configuração na inicialização"""
+        # Validar LLM
+        if not self.system.llm.api_key:
+            logger.warning("⚠️ LLM_API_KEY não configurada. Configure no .env")
+        
+        # Validar diretório de trabalho
+        if not os.path.exists(self.system.working_dir):
+            logger.warning(f"⚠️ Diretório de trabalho não existe: {self.system.working_dir}")
+            try:
+                os.makedirs(self.system.working_dir, exist_ok=True)
+                logger.info(f"✅ Diretório criado: {self.system.working_dir}")
+            except Exception as e:
+                logger.error(f"❌ Erro ao criar diretório: {e}")
+        
+        logger.info(f"✅ Configuração validada")
     
     def get_config(self) -> Dict:
         """Retorna configuração para o frontend"""
